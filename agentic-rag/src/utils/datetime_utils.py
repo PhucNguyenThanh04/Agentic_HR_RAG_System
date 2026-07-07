@@ -9,13 +9,25 @@ from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from pydantic import BaseModel, field_serializer
 
-BASE_DIR = Path(__file__).resolve().parents[4]
+def _find_project_root() -> Path:
+    """Tìm thư mục gốc dự án (chứa run.py). Hoạt động cả local và Docker."""
+    current = Path(__file__).resolve().parent
+    for parent in [current] + list(current.parents):
+        if (parent / "run.py").exists():
+            return parent
+    # Fallback: trong Docker WORKDIR=/app
+    return Path("/app")
+
+
+BASE_DIR = _find_project_root()
 DEFAULT_APP_TIMEZONE = "Asia/Ho_Chi_Minh"
 
 
 @lru_cache
 def get_app_timezone() -> ZoneInfo:
-    load_dotenv(BASE_DIR / ".env")
+    env_path = BASE_DIR / ".env"
+    if env_path.exists():
+        load_dotenv(env_path)
     return ZoneInfo(os.getenv("DATABASE_TIMEZONE", DEFAULT_APP_TIMEZONE))
 
 
