@@ -15,7 +15,7 @@ Một hệ thống HR chatbot theo kiến trúc multi-service: Core Backend xác
 
 ## Features
 
-- ReAct Agent tự chọn tool: `vector_search`, `employee_query`, `shift_query`, `attendance_query`, `ask_user`.
+- ReAct Agent tự chọn tool: `vector_search`, `api_query_db`, `ask_user`.
 - RAG tiếng Việt với BGE-M3 dense+sparse, Qdrant hybrid search, RRF và reranking.
 - Multi-turn clarification bằng Redis Pending Store khi câu hỏi thiếu thông tin.
 - Core Backend xác thực JWT, truyền `employee_id` và `user_role` đã xác thực sang Agentic Service.
