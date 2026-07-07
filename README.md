@@ -69,7 +69,7 @@ Một hệ thống HR chatbot theo kiến trúc multi-service: Core Backend xác
 | Tool | Input chính | Output | Dùng khi |
 |---|---|---|---|
 | `vector_search` | `{ "query": "..." }` | `ToolResult` gồm observation, citations, `used_context`, `low_confidence` | Tra cứu chính sách, nội quy, quy trình đã index trong Qdrant. |
-| `employee_query` | `{role, employee_id}` | Tra cứu dữ liệu trong database|
+| `api query db` | `{role, employee_id}` | Tra cứu dữ liệu trong database|
 | `ask_user` | `question`, `options`, `allow_free_text` | Signal `__ASK_USER__{...}` để lưu pending state | Câu hỏi thiếu mốc thời gian, loại phép, hoặc điều kiện cần làm rõ. |
 
 > Ghi chú: README cũ gọi chung nhóm tool nghiệp vụ là `api_query_database`; trong code hiện tại nhóm này được tách thành `employee_query`, `shift_query`, `attendance_query`.
