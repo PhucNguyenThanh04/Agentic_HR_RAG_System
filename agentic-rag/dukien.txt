@@ -1,0 +1,5 @@
+1. Polish working memory
+2. Redis short-term chat history
+3. Redis pending state cho ask_user
+4. Tool result cache
+5. Long-term user memory

@@ -1,0 +1,559 @@
+Project FaceAttendanceManagementSystem {
+  database_type: 'PostgreSQL'
+  Note: 'Generated from SQLAlchemy models under src/api/v1/features. face_profiles.qdrant_point_ids is removed in the current model.'
+}
+
+Enum role_name {
+  admin
+  hr
+  manager
+  employee
+}
+
+Enum user_status {
+  active
+  inactive
+  locked
+}
+
+Enum employee_status {
+  active
+  inactive
+  resigned
+}
+
+Enum face_profile_status {
+  pending
+  active
+  revoked
+  failed
+}
+
+Enum attendance_event_type {
+  check_in
+  check_out
+  unknown
+}
+
+Enum attendance_record_status {
+  present
+  late
+  early_leave
+  late_and_early_leave
+  absent
+  on_leave
+  holiday
+  missing_check_in
+  missing_check_out
+  manually_edited
+}
+
+Enum attendance_source {
+  face_recognition
+  manual
+  edited
+  system
+}
+
+Enum leave_request_status {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+Enum leave_time_type {
+  full_day
+  morning
+  afternoon
+  custom
+}
+
+Enum approval_action {
+  approved
+  rejected
+  forwarded
+  cancelled
+}
+
+Enum correction_request_status {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+Enum notification_type {
+  attendance
+  leave
+  correction
+  system
+  face_registration
+}
+
+Enum audit_action {
+  create
+  update
+  delete
+  approve
+  reject
+  login
+  logout
+  revoke
+  manual_edit
+}
+
+Table roles {
+  role_id integer [pk, increment]
+  name role_name [not null, unique]
+  description text
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+}
+
+Table users {
+  user_id uuid [pk, default: `gen_random_uuid()`]
+  email varchar [not null, unique]
+  password_hash varchar [not null]
+  role_id integer [not null]
+  status user_status [not null, default: 'active']
+  token_version integer [not null, default: 0]
+  last_login_at timestamptz
+  refresh_token_hash text
+  refresh_token_expires_at timestamptz
+  refresh_token_created_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    email [unique, name: 'ix_users_email']
+    role_id [name: 'ix_users_role_id']
+    status [name: 'ix_users_status']
+  }
+}
+
+Table departments {
+  department_id integer [pk, increment]
+  name varchar [not null]
+  code varchar [unique]
+  description text
+  is_active boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    name [name: 'ix_departments_name']
+    code [unique, name: 'ix_departments_code']
+    is_active [name: 'ix_departments_is_active']
+  }
+}
+
+Table positions {
+  position_id integer [pk, increment]
+  name varchar [not null, unique]
+  code varchar [unique]
+  description text
+  is_active boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    name [unique, name: 'ix_positions_name']
+    code [unique, name: 'ix_positions_code']
+    is_active [name: 'ix_positions_is_active']
+  }
+}
+
+Table employees {
+  employee_id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [unique]
+  registered_by uuid [note: 'User who created this employee profile']
+  employee_code varchar [not null, unique]
+  full_name varchar [not null]
+  phone varchar
+  avatar_url text
+  department_id integer
+  position_id integer
+  manager_id uuid
+  date_of_birth date
+  gender varchar [note: 'male | female | other']
+  address text
+  hire_date date
+  resignation_date date
+  status employee_status [not null, default: 'active']
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    user_id [unique, name: 'ix_employees_user_id']
+    registered_by [name: 'ix_employees_registered_by']
+    employee_code [unique, name: 'ix_employees_employee_code']
+    full_name [name: 'ix_employees_full_name']
+    department_id [name: 'ix_employees_department_id']
+    position_id [name: 'ix_employees_position_id']
+    manager_id [name: 'ix_employees_manager_id']
+    status [name: 'ix_employees_status']
+  }
+}
+
+Table department_managers {
+  manager_id uuid [pk]
+  department_id integer [pk]
+  assigned_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    department_id [name: 'ix_department_managers_department_id']
+  }
+}
+
+Table work_shifts {
+  shift_id integer [pk, increment]
+  name varchar [not null]
+  code varchar [unique]
+  start_time time [not null]
+  end_time time [not null]
+  is_overnight boolean [not null, default: false]
+  late_threshold_minutes integer [not null, default: 0]
+  early_leave_threshold_minutes integer [not null, default: 0]
+  required_work_minutes integer [note: 'Required working minutes to count as full attendance']
+  is_active boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    code [unique, name: 'ix_work_shifts_code']
+    is_active [name: 'ix_work_shifts_is_active']
+  }
+}
+
+Table employee_shift_assignments {
+  assignment_id integer [pk, increment]
+  employee_id uuid [not null]
+  shift_id integer [not null]
+  effective_date date [not null]
+  end_date date
+  created_by uuid
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    employee_id [name: 'ix_employee_shift_assignments_employee_id']
+    shift_id [name: 'ix_employee_shift_assignments_shift_id']
+    effective_date [name: 'ix_employee_shift_assignments_effective_date']
+    end_date [name: 'ix_employee_shift_assignments_end_date']
+  }
+}
+
+Table holidays {
+  holiday_id integer [pk, increment]
+  name varchar [not null]
+  holiday_date date [not null, unique]
+  description varchar
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    holiday_date [unique, name: 'ix_holidays_holiday_date']
+  }
+}
+
+Table face_profiles {
+  profile_id uuid [pk, default: `gen_random_uuid()`]
+  employee_id uuid [not null, unique]
+  status face_profile_status [not null, default: 'pending']
+  qdrant_collection varchar [not null, note: 'Ten collection trong Qdrant']
+  embedding_model varchar [note: 'e.g. buffalo_l / arcface']
+  embedding_version varchar [note: 'Used when switching embedding model']
+  registered_by uuid
+  revocation_reason text
+  revoked_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    employee_id [unique, name: 'ix_face_profiles_employee_id']
+    status [name: 'ix_face_profiles_status']
+    qdrant_collection [name: 'ix_face_profiles_qdrant_collection']
+  }
+}
+
+Table attendance_events {
+  event_id uuid [pk, default: `gen_random_uuid()`]
+  employee_id uuid
+  event_type attendance_event_type [not null]
+  event_time timestamptz [not null]
+  confidence_score float
+  anti_spoof_score float
+  image_url text
+  raw_result jsonb [note: 'Full JSON response from AI service']
+  is_accepted boolean [not null, default: true]
+  rejection_reason text
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    employee_id [name: 'ix_attendance_events_employee_id']
+    event_type [name: 'ix_attendance_events_event_type']
+    event_time [name: 'ix_attendance_events_event_time']
+  }
+}
+
+Table attendance_records {
+  record_id uuid [pk, default: `gen_random_uuid()`]
+  employee_id uuid [not null]
+  shift_id integer
+  work_date date [not null, note: 'Business date. Model comment says this should be date; current SQLAlchemy declaration omits an explicit Date type.']
+  check_in_time timestamptz
+  check_out_time timestamptz
+  status attendance_record_status [not null]
+  late_minutes integer [not null, default: 0]
+  early_leave_minutes integer [not null, default: 0]
+  worked_minutes integer [not null, default: 0]
+  source attendance_source [not null, default: 'face_recognition']
+  notes text
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    employee_id [name: 'ix_attendance_records_employee_id']
+    shift_id [name: 'ix_attendance_records_shift_id']
+    work_date [name: 'ix_attendance_records_work_date']
+    status [name: 'ix_attendance_records_status']
+    source [name: 'ix_attendance_records_source']
+  }
+
+  Note: 'Model docstring says each employee should have one record per work_date, but no composite unique constraint is currently declared in the ORM model/migration.'
+}
+
+Table leave_types {
+  leave_type_id integer [pk, increment]
+  name varchar [not null]
+  code varchar [unique]
+  is_paid boolean [not null, default: true]
+  max_days_per_year integer
+  description text
+  is_active boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    code [unique, name: 'ix_leave_types_code']
+    is_paid [name: 'ix_leave_types_is_paid']
+    is_active [name: 'ix_leave_types_is_active']
+  }
+}
+
+Table leave_requests {
+  request_id uuid [pk, default: `gen_random_uuid()`]
+  employee_id uuid [not null]
+  leave_type_id integer [not null]
+  start_date date [not null]
+  end_date date [not null]
+  time_type leave_time_type [not null, default: 'full_day']
+  total_days float
+  reason text
+  status leave_request_status [not null, default: 'pending']
+  approved_by uuid
+  approved_at timestamptz
+  rejection_reason text
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    employee_id [name: 'ix_leave_requests_employee_id']
+    leave_type_id [name: 'ix_leave_requests_leave_type_id']
+    start_date [name: 'ix_leave_requests_start_date']
+    end_date [name: 'ix_leave_requests_end_date']
+    status [name: 'ix_leave_requests_status']
+  }
+}
+
+Table leave_approval_logs {
+  log_id integer [pk, increment]
+  leave_request_id uuid [not null]
+  approver_id uuid [not null]
+  action approval_action [not null]
+  comment text
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    leave_request_id [name: 'ix_leave_approval_logs_leave_request_id']
+    approver_id [name: 'ix_leave_approval_logs_approver_id']
+    action [name: 'ix_leave_approval_logs_action']
+    created_at [name: 'ix_leave_approval_logs_created_at']
+  }
+}
+
+Table attendance_correction_requests {
+  request_id uuid [pk, default: `gen_random_uuid()`]
+  employee_id uuid [not null]
+  attendance_record_id uuid
+  requested_check_in timestamptz
+  requested_check_out timestamptz
+  reason text [not null]
+  status correction_request_status [not null, default: 'pending']
+  reviewed_by uuid
+  reviewed_at timestamptz
+  rejection_reason text
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    employee_id [name: 'ix_attendance_correction_requests_employee_id']
+    attendance_record_id [name: 'ix_attendance_correction_requests_attendance_record_id']
+    reviewed_by [name: 'ix_attendance_correction_requests_reviewed_by']
+    status [name: 'ix_attendance_correction_requests_status']
+  }
+}
+
+Table attendance_correction_logs {
+  log_id integer [pk, increment]
+  correction_request_id uuid [not null]
+  reviewer_id uuid [not null]
+  action approval_action [not null]
+  comment text
+  old_check_in timestamptz
+  old_check_out timestamptz
+  new_check_in timestamptz
+  new_check_out timestamptz
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    correction_request_id [name: 'ix_attendance_correction_logs_correction_request_id']
+    reviewer_id [name: 'ix_attendance_correction_logs_reviewer_id']
+    action [name: 'ix_attendance_correction_logs_action']
+    created_at [name: 'ix_attendance_correction_logs_created_at']
+  }
+}
+
+Table notifications {
+  notification_id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null]
+  title varchar [not null]
+  content text
+  type notification_type [not null]
+  object_type varchar [note: 'leave_request | correction_request | attendance_record | face_profile']
+  object_id varchar
+  is_read boolean [not null, default: false]
+  read_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    user_id [name: 'ix_notifications_user_id']
+    type [name: 'ix_notifications_type']
+    is_read [name: 'ix_notifications_is_read']
+    created_at [name: 'ix_notifications_created_at']
+  }
+}
+
+Table audit_logs {
+  log_id uuid [pk, default: `gen_random_uuid()`]
+  performed_by uuid
+  action audit_action [not null]
+  object_type varchar [not null]
+  object_id varchar
+  old_value jsonb
+  new_value jsonb
+  reason text
+  ip_address varchar
+  user_agent text
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    performed_by [name: 'ix_audit_logs_performed_by']
+    action [name: 'ix_audit_logs_action']
+    object_type [name: 'ix_audit_logs_object_type']
+    object_id [name: 'ix_audit_logs_object_id']
+    created_at [name: 'ix_audit_logs_created_at']
+  }
+}
+
+Table system_settings {
+  setting_id integer [pk, increment]
+  key varchar [not null, unique]
+  value jsonb [not null]
+  description text
+  updated_by uuid
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    key [unique, name: 'ix_system_settings_key']
+  }
+}
+
+TableGroup "Users & Staff" {
+  roles
+  users
+  departments
+  positions
+  employees
+  department_managers
+}
+
+TableGroup "Scheduling" {
+  work_shifts
+  employee_shift_assignments
+  holidays
+}
+
+TableGroup "Face & Attendance" {
+  face_profiles
+  attendance_events
+  attendance_records
+}
+
+TableGroup "Workflow" {
+  leave_types
+  leave_requests
+  leave_approval_logs
+  attendance_correction_requests
+  attendance_correction_logs
+}
+
+TableGroup "Cross Cutting" {
+  notifications
+  audit_logs
+  system_settings
+}
+
+Ref: users.role_id > roles.role_id [delete: restrict]
+
+Ref: employees.user_id > users.user_id [delete: set null]
+Ref: employees.registered_by > users.user_id [delete: set null]
+Ref: employees.department_id > departments.department_id [delete: set null]
+Ref: employees.position_id > positions.position_id [delete: set null]
+Ref: employees.manager_id > employees.employee_id [delete: set null]
+
+Ref: department_managers.manager_id > employees.employee_id [delete: cascade]
+Ref: department_managers.department_id > departments.department_id [delete: cascade]
+
+Ref: employee_shift_assignments.employee_id > employees.employee_id [delete: cascade]
+Ref: employee_shift_assignments.shift_id > work_shifts.shift_id [delete: restrict]
+Ref: employee_shift_assignments.created_by > users.user_id [delete: set null]
+
+Ref: face_profiles.employee_id > employees.employee_id [delete: cascade]
+Ref: face_profiles.registered_by > users.user_id [delete: set null]
+
+Ref: attendance_events.employee_id > employees.employee_id [delete: set null]
+Ref: attendance_records.employee_id > employees.employee_id [delete: cascade]
+Ref: attendance_records.shift_id > work_shifts.shift_id [delete: set null]
+
+Ref: leave_requests.employee_id > employees.employee_id [delete: cascade]
+Ref: leave_requests.leave_type_id > leave_types.leave_type_id [delete: restrict]
+Ref: leave_requests.approved_by > employees.employee_id [delete: set null]
+
+Ref: leave_approval_logs.leave_request_id > leave_requests.request_id [delete: cascade]
+Ref: leave_approval_logs.approver_id > employees.employee_id [delete: restrict]
+
+Ref: attendance_correction_requests.employee_id > employees.employee_id [delete: cascade]
+Ref: attendance_correction_requests.attendance_record_id > attendance_records.record_id [delete: set null]
+Ref: attendance_correction_requests.reviewed_by > employees.employee_id [delete: set null]
+
+Ref: attendance_correction_logs.correction_request_id > attendance_correction_requests.request_id [delete: cascade]
+Ref: attendance_correction_logs.reviewer_id > employees.employee_id [delete: restrict]
+
+Ref: notifications.user_id > users.user_id [delete: cascade]
+
+Ref: audit_logs.performed_by > users.user_id [delete: set null]
+
+Ref: system_settings.updated_by > users.user_id [delete: set null]

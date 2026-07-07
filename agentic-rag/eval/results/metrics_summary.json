@@ -1,0 +1,109 @@
+{
+  "total_samples": 24,
+  "ask_user_rate": 0.0417,
+  "not_done_rate": 0.0,
+  "avg_steps": 2.38,
+  "latency_ms": {
+    "mean": 7440.1,
+    "p50": 5741.0,
+    "p95": 19923.0,
+    "min": 3528.1,
+    "max": 22887.0
+  },
+  "tool_selection": {
+    "total": 24,
+    "first_call_accuracy": 0.9583,
+    "any_call_accuracy": 0.9583
+  },
+  "correctness": {
+    "graded": 24,
+    "ungraded": 0,
+    "accuracy": 0.875
+  },
+  "breakdown_by_expected_tool": {
+    "vector_search": {
+      "count": 15,
+      "tool_selection": {
+        "total": 15,
+        "first_call_accuracy": 1.0,
+        "any_call_accuracy": 1.0
+      },
+      "correctness": {
+        "graded": 15,
+        "ungraded": 0,
+        "accuracy": 0.8667
+      },
+      "avg_steps": 2.47,
+      "latency_ms": {
+        "mean": 8999.5,
+        "p50": 6749.5,
+        "p95": 21653.9,
+        "min": 4555.5,
+        "max": 22887.0
+      }
+    },
+    "employee_query": {
+      "count": 3,
+      "tool_selection": {
+        "total": 3,
+        "first_call_accuracy": 1.0,
+        "any_call_accuracy": 1.0
+      },
+      "correctness": {
+        "graded": 3,
+        "ungraded": 0,
+        "accuracy": 1.0
+      },
+      "avg_steps": 2,
+      "latency_ms": {
+        "mean": 3801.7,
+        "p50": 3736.6,
+        "p95": 4099.9,
+        "min": 3528.1,
+        "max": 4140.3
+      }
+    },
+    "shift_query": {
+      "count": 4,
+      "tool_selection": {
+        "total": 4,
+        "first_call_accuracy": 0.75,
+        "any_call_accuracy": 0.75
+      },
+      "correctness": {
+        "graded": 4,
+        "ungraded": 0,
+        "accuracy": 0.75
+      },
+      "avg_steps": 2,
+      "latency_ms": {
+        "mean": 4654.6,
+        "p50": 4278.0,
+        "p95": 5936.9,
+        "min": 3851.0,
+        "max": 6211.4
+      }
+    },
+    "attendance_query": {
+      "count": 2,
+      "tool_selection": {
+        "total": 2,
+        "first_call_accuracy": 1.0,
+        "any_call_accuracy": 1.0
+      },
+      "correctness": {
+        "graded": 2,
+        "ungraded": 0,
+        "accuracy": 1.0
+      },
+      "avg_steps": 3,
+      "latency_ms": {
+        "mean": 6772.7,
+        "p50": 6772.7,
+        "p95": 8938.0,
+        "min": 4366.8,
+        "max": 9178.6
+      }
+    }
+  }
+}
