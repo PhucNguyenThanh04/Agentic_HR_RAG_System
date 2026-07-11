@@ -72,7 +72,6 @@ Một hệ thống HR chatbot theo kiến trúc multi-service: Core Backend xác
 | `api query db` | `{role, employee_id}` | Tra cứu dữ liệu trong database|
 | `ask_user` | `question`, `options`, `allow_free_text` | Signal `__ASK_USER__{...}` để lưu pending state | Câu hỏi thiếu mốc thời gian, loại phép, hoặc điều kiện cần làm rõ. |
 
-> Ghi chú: README cũ gọi chung nhóm tool nghiệp vụ là `api_query_database`; trong code hiện tại nhóm này được tách thành `employee_query`, `shift_query`, `attendance_query`.
 
 ### Multi-turn Clarification
 
