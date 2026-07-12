@@ -120,7 +120,6 @@ Trong quá trình phát triển Agentic Multi-turn, một vấn đề nghiêm tr
 | Agentic Service | FastAPI, Gemini API, custom ReAct loop | Reasoning, tool dispatch, final answer, streaming. |
 | RAG | Qdrant, BGE-M3, BGE-Reranker-v2-m3, FlagEmbedding | Hybrid retrieval, dense+sparse vectors, reranking. |
 | State & Data | PostgreSQL, Redis | Database nghiệp vụ, cache/session, pending agent state. |
-| Frontend | React 19, TypeScript, Vite, React Query, Zustand, Axios | Dashboard và chat UI. |
 | Infra | Docker Compose, CUDA/NVIDIA Container Toolkit | Chạy local multi-service, GPU cho embedding/reranker. |
 
 ## Project Structure
