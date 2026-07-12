@@ -248,8 +248,10 @@ api-service/
 
 ```bash
 cp api-service/.env.example api-service/.env
+cp agentic-rag/.env.example agentic-rag/.env
 
-# Tạo agentic-rag/.env theo biến trong .env.example
+# fill các biến theo .env.example
+
 ```
 
 Đảm bảo `RAG_API_KEY` giống nhau ở `api-service/.env` và `agentic-rag/.env`.
