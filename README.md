@@ -124,37 +124,113 @@ Trong quá trình phát triển Agentic Multi-turn, một vấn đề nghiêm tr
 
 ## Project Structure
 
+### agentic-rag — Agentic Service (port 8081)
+
 ```text
-hr_bot/
-├── agentic-rag/              # Agentic Service: ReAct + RAG (port 8081)
-│   ├── src/
-│   │   ├── agents/           # Supervisor, Executor, AgentState, Pending Store
-│   │   ├── api/              # Chat/document ingestion routers
-│   │   ├── features/         # Chat/document services & schemas
-│   │   ├── integrations/     # Gemini, Qdrant, Redis, api-service clients
-│   │   ├── rag/              # Ingestion, embeddings, retrieval, reranker
-│   │   ├── tools/            # vector_search, api_queries, ask_user
-│   │   └── main.py           # FastAPI app
-│   ├── Dockerfile
-│   └── requirements.txt
-├── api-service/              # Core Backend nghiệp vụ (port 8000)
-│   ├── alembic/              # Database migrations
-│   ├── src/
-│   │   ├── api/              # Auth, users, employees, attendance, chat...
-│   │   ├── core/             # Settings, DB, Redis, middleware, clients
-│   │   └── main.py           # FastAPI app
-│   ├── Dockerfile
-│   └── requirements.txt
-├── web-dashboard/            # React + TypeScript + Vite frontend
-│   ├── src/
-│   ├── package.json
-│   └── vite.config.ts
-├── docs/
-│   ├── System_Architecture.png
-│   ├── ReAct.png
-│   └── RAG_Pipeline.png
-├── docker-compose.yml
-└── README.md
+agentic-rag/
+├── src/
+│   ├── agents/                        # ReAct Agent core
+│   │   ├── supervisor.py              # Chạy ReAct loop: Thought → Action → Observation → Final Answer
+│   │   ├── executor.py                # Gọi tool thật từ registry, trả observation
+│   │   ├── state.py                   # AgentState: giữ history, scratchpad, metadata qua các bước
+│   │   └── pending_store.py           # Lưu/resume AgentState vào Redis khi ask_user
+│   │
+│   ├── tools/                         # Tool registry & implementations
+│   │   ├── registry.py                # Map tên tool → class, cung cấp danh sách cho prompt
+│   │   ├── base_tool.py               # BaseTool abstract class
+│   │   ├── vector_search_tool.py      # Gọi retrieval pipeline, trả context + citations
+│   │   ├── ask_user_tool.py           # Sinh signal __ASK_USER__ để hỏi lại người dùng
+│   │   └── api_queries/               # Nhóm tool truy vấn dữ liệu qua api-service
+│   │       ├── attendance_tool.py     # Lịch sử chấm công, check-in/check-out
+│   │       ├── employee_tool.py       # Thông tin nhân viên (tên, phòng ban, chức vụ)
+│   │       ├── shift_tool.py          # Ca làm việc, lịch trực
+│   │       ├── schemas.py             # Pydantic schemas cho API response
+│   │       ├── formatters.py          # Format dữ liệu API thành text cho LLM
+│   │       └── errors.py              # Error handling cho API tool
+│   │
+│   ├── rag/                           # RAG Pipeline
+│   │   ├── embeddings/
+│   │   │   ├── embedding_client.py    # BGE-M3 client: dense + sparse vectors
+│   │   │   └── embedding_service.py   # Singleton quản lý model lifecycle
+│   │   ├── ingestion/
+│   │   │   ├── pipeline.py            # Orchestrate load → chunk → index
+│   │   │   ├── indexer.py             # Upsert vectors + metadata vào Qdrant
+│   │   │   ├── chunkers/              # Chunk theo Điều/Khoản cho tài liệu pháp lý
+│   │   │   └── loaders/               # Load PDF/DOCX/TXT
+│   │   └── retrieval/
+│   │       ├── retrieval_pipeline.py  # Orchestrate retrieve → rerank → build context
+│   │       ├── hybrid_retriever.py    # Qdrant hybrid search (dense + sparse + RRF)
+│   │       ├── reranker.py            # BGE-Reranker-v2-m3 rerank + confidence filter
+│   │       ├── context_builder.py     # Ghép chunks thành context string + citations
+│   │       └── schemas.py             # RetrievalResult, Citation, ContextChunk
+│   │
+│   ├── integrations/                  # External service clients
+│   │   ├── llm/
+│   │   │   ├── client.py             # Gemini API client (generate, parse JSON)
+│   │   │   └── prompts.py            # System prompt, ReAct format, tool descriptions
+│   │   ├── qdrant/
+│   │   │   ├── client.py             # Qdrant connection singleton
+│   │   │   └── store.py              # Collection CRUD, search, upsert
+│   │   ├── cache/
+│   │   │   └── redis_client.py       # Redis connection cho pending state
+│   │   └── api_service/
+│   │       ├── clients.py            # HTTP client gọi api-service internal endpoints
+│   │       └── schemas.py            # Response schemas từ api-service
+│   │
+│   ├── api/v1/                        # FastAPI routers
+│   │   ├── chat_router.py            # POST /chat, /chat/stream (nhận từ api-service)
+│   │   └── document_router.py        # POST /documents/ingest
+│   │
+│   ├── features/                      # Business logic layer
+│   │   ├── chat/
+│   │   │   ├── service.py            # ChatService: orchestrate agent + streaming
+│   │   │   └── schemas.py            # ChatRequest, ChatResponse
+│   │   └── documents/
+│   │       ├── service.py            # DocumentService: trigger ingestion pipeline
+│   │       └── schemas.py
+│   │
+│   ├── observability/
+│   │   └── agent_logs.py             # Structured logging cho ReAct steps
+│   │
+│   ├── core/
+│   │   ├── settings.py               # Pydantic Settings (env vars)
+│   │   ├── dependenci.py             # FastAPI dependency injection
+│   │   └── setup_logging.py          # Logging configuration
+│   │
+│   ├── utils/
+│   │   ├── datetime_utils.py         # Timezone helpers cho dữ liệu HR
+│   │   └── enums.py                  # Shared enums (ToolName, FinishReason...)
+│   │
+│   └── main.py                       # FastAPI app entrypoint
+│
+├── eval/                              # RAGAS evaluation scripts & results
+├── Dockerfile
+└── requirements.txt
+```
+
+### api-service — Các phần liên quan đến Agentic RAG (port 8000)
+
+```text
+api-service/
+├── src/
+│   ├── api/v1/features/
+│   │   ├── chat/                     # Proxy: nhận message từ frontend, gọi agentic-rag
+│   │   ├── attendance/               # CRUD chấm công — agentic-rag gọi qua api_queries
+│   │   ├── shifts/                   # Ca làm việc — agentic-rag gọi qua api_queries
+│   │   ├── staff/                    # Thông tin nhân viên — agentic-rag gọi qua api_queries
+│   │   ├── leaves/                   # Nghỉ phép
+│   │   ├── corrections/              # Đơn điều chỉnh chấm công
+│   │   └── auth/                     # JWT auth, xác định employee_id trước khi gọi agent
+│   │
+│   ├── core/
+│   │   ├── clients/chatbox/          # HTTP client gọi agentic-rag (internal, X-API-Key)
+│   │   ├── security/                 # JWT verify, RBAC
+│   │   └── middleware/               # Rate-limit, CORS, request logging
+│   │
+│   └── main.py
+│
+├── alembic/                          # Database migrations
+└── Dockerfile
 ```
 
 ## Getting Started
