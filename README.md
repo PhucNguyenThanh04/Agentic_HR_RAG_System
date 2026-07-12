@@ -249,8 +249,7 @@ api-service/
 ```bash
 cp api-service/.env.example api-service/.env
 
-# agentic-rag/.env.example hiện chưa có trong repo.
-# Tạo agentic-rag/.env theo bảng biến môi trường ở trên.
+# Tạo agentic-rag/.env theo biến trong .env.example
 ```
 
 Đảm bảo `RAG_API_KEY` giống nhau ở `api-service/.env` và `agentic-rag/.env`.
