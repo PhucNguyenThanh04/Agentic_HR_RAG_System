@@ -38,6 +38,9 @@ def log_agent_tool_result(
     success: bool,
     result_preview: str,
     *,
+    outcome: str = "success",
+    retryable: bool = False,
+    result_count: int | None = None,
     used_context: bool = False,
     low_confidence: bool = False,
     is_ask_user: bool = False,
@@ -47,6 +50,9 @@ def log_agent_tool_result(
         level,
         f"[TOOL {step}] {tool_name} "
         f"success={success} "
+        f"outcome={outcome} "
+        f"retryable={retryable} "
+        f"result_count={result_count} "
         f"used_context={used_context} "
         f"low_confidence={low_confidence} "
         f"ask_user={is_ask_user} "

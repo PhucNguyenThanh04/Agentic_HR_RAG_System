@@ -4,10 +4,10 @@ import httpx
 from pydantic import ValidationError
 
 from src.integrations.api_service.clients import APIServiceClient
-from src.tools.api_queries.errors import format_api_error
+from src.tools.api_queries.errors import build_api_error_result
 from src.tools.api_queries.formatters import format_employee
 from src.tools.api_queries.schemas import EmployeeQueryInput
-from src.tools.base_tool import BaseTool
+from src.tools.base_tool import BaseTool, ToolResult
 
 
 class EmployeeQueryTool(BaseTool):
@@ -32,10 +32,16 @@ class EmployeeQueryTool(BaseTool):
         self.employee_id = employee_id
         self.user_role = user_role
 
-    async def run(self) -> str:
+    async def run(self) -> ToolResult:
         try:
             employee = await self.api_service_client.get_employee(self.employee_id)
         except (ValidationError, httpx.HTTPError) as exc:
-            return format_api_error(exc)
+            return build_api_error_result(
+                exc,
+                not_found_observation="Không tìm thấy hồ sơ nhân viên hiện tại.",
+            )
 
-        return format_employee(employee)
+        return ToolResult(
+            observation=format_employee(employee),
+            metadata={"result_count": 1, "query_complete": True},
+        )

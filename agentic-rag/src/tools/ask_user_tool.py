@@ -3,7 +3,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.tools.base_tool import BaseTool
+from src.tools.base_tool import BaseTool, ToolResult
 
 ASK_USER_PREFIX = "__ASK_USER__"
 
@@ -46,7 +46,7 @@ class AskUserTool(BaseTool):
         question: str = "",
         options: list[str] | None = None,
         allow_free_text: bool = True,
-    ) -> str:
+    ) -> ToolResult:
         if not question.strip():
             question = "Bạn có thể cung cấp thêm thông tin để tôi hỗ trợ tốt hơn không?"
 
@@ -55,7 +55,10 @@ class AskUserTool(BaseTool):
             "options": options or [],
             "allow_free_text": allow_free_text,
         }
-        return f"{ASK_USER_PREFIX}{json.dumps(payload, ensure_ascii=False)}"
+        return ToolResult(
+            observation=f"{ASK_USER_PREFIX}{json.dumps(payload, ensure_ascii=False)}",
+            metadata={"control_action": "ask_user"},
+        )
 
     @staticmethod
     def is_ask_user(observation: str) -> bool:

@@ -7,7 +7,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from src.tools.ask_user_tool import AskUserTool
-from src.tools.base_tool import ToolCitation, ToolResult
+from src.tools.base_tool import ToolCitation, ToolOutcome, ToolResult
 from src.tools.registry import ToolRegistry
 
 logger = logging.getLogger(__name__)
@@ -21,6 +21,8 @@ TOOL_RUNTIME_ERROR_OBSERVATION = (
 @dataclass
 class ExecutionResult:
     observation: str
+    outcome: ToolOutcome = "success"
+    retryable: bool = False
     is_ask_user: bool = False
     ask_user_payload: dict[str, Any] | None = None
     is_error: bool = False
@@ -58,6 +60,7 @@ class Executor:
                     f"Tool '{action}' không tồn tại. "
                     f"Các tool có sẵn: {available}"
                 ),
+                outcome="error",
                 is_error=True,
             )
 
@@ -66,6 +69,7 @@ class Executor:
         except ValidationError as exc:
             return ExecutionResult(
                 observation=f"Tham số tool '{action}' không hợp lệ: {exc}",
+                outcome="error",
                 is_error=True,
             )
 
@@ -75,6 +79,7 @@ class Executor:
             logger.error("Tool '%s' error: %s", action, exc, exc_info=True)
             return ExecutionResult(
                 observation=TOOL_RUNTIME_ERROR_OBSERVATION.format(action=action),
+                outcome="error",
                 is_error=True,
             )
 
@@ -94,6 +99,8 @@ class Executor:
             else:
                 return ExecutionResult(
                     observation=observation,
+                    outcome=tool_result.outcome,
+                    retryable=tool_result.retryable,
                     is_ask_user=True,
                     ask_user_payload=payload,
                     citations=tool_result.citations,
@@ -104,6 +111,9 @@ class Executor:
 
         return ExecutionResult(
             observation=observation,
+            outcome=tool_result.outcome,
+            retryable=tool_result.retryable,
+            is_error=tool_result.outcome == "error",
             citations=tool_result.citations,
             used_context=tool_result.used_context,
             low_confidence=tool_result.low_confidence,
@@ -111,10 +121,19 @@ class Executor:
         )
 
     @staticmethod
-    def _normalize_tool_result(result: str | ToolResult | None) -> ToolResult:
+    def _normalize_tool_result(result: ToolResult) -> ToolResult:
         if isinstance(result, ToolResult):
             return result
-        return ToolResult(observation=str(result or ""))
+        logger.error(
+            "Tool returned unsupported result type: %s",
+            type(result).__name__,
+        )
+        return ToolResult(
+            observation="[Tool error: tool returned an invalid result type.]",
+            outcome="error",
+            retryable=False,
+            metadata={"invalid_result_type": type(result).__name__},
+        )
 
     @staticmethod
     def _validate_action_input(tool: Any, action_input: dict[str, Any]) -> dict[str, Any]:

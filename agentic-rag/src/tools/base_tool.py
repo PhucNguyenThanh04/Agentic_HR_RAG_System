@@ -2,16 +2,20 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
 from src.rag.retrieval.schemas import ToolCitation
 
+ToolOutcome = Literal["success", "empty", "error"]
+
 
 @dataclass
 class ToolResult:
     observation: str
+    outcome: ToolOutcome = "success"
+    retryable: bool = False
     citations: list[ToolCitation] = field(default_factory=list)
     used_context: bool = False
     low_confidence: bool = False
@@ -26,9 +30,9 @@ class BaseTool(ABC):
     input_example: str = "{}"     # Ví dụ action_input cho LLM prompt
 
     @abstractmethod
-    async def run(self, **kwargs) -> str | ToolResult:
+    async def run(self, **kwargs) -> ToolResult:
         """
-        Thực thi tool và trả về observation string hoặc ToolResult có metadata.
+        Thực thi tool và trả về kết quả có outcome/metadata cấu trúc.
         """
         pass
 

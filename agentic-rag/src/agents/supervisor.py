@@ -26,6 +26,8 @@ from src.tools.registry import ToolRegistry
 logger = logging.getLogger(__name__)
 
 MAX_ASK_USER_COUNT = 2
+DUPLICATE_GUARD_ACTION = "_duplicate_guard"
+MAX_RETRYABLE_TOOL_ATTEMPTS = 2
 
 AgentStreamEvent = tuple[str, dict[str, Any]]
 
@@ -152,6 +154,17 @@ class Supervisor:
                 state.finish_with_answer(answer)
                 break
 
+            duplicate_guard_step = self._build_duplicate_guard_step(
+                state=state,
+                thought=thought,
+                action=action,
+                action_input=action_input,
+            )
+            if duplicate_guard_step is not None:
+                state.add_step(duplicate_guard_step)
+                self._log_step(state, duplicate_guard_step)
+                continue
+
             next_step = state.step_count + 1
             log_agent_tool_dispatch(
                 step=next_step,
@@ -164,6 +177,9 @@ class Supervisor:
                 tool_name=action,
                 success=not result.is_error,
                 result_preview=result.observation,
+                outcome=result.outcome,
+                retryable=result.retryable,
+                result_count=result.metadata.get("result_count"),
                 used_context=result.used_context,
                 low_confidence=result.low_confidence,
                 is_ask_user=result.is_ask_user,
@@ -174,11 +190,16 @@ class Supervisor:
                     action=action,
                     action_input=action_input,
                     observation=result.observation,
+                    outcome=result.outcome,
+                    retryable=result.retryable,
                     is_error=result.is_error,
                     citations=result.citations,
                     used_context=result.used_context,
                     low_confidence=result.low_confidence,
-                    metadata=result.metadata,
+                    metadata={
+                        **result.metadata,
+                        "tool_signature": self._tool_signature(action, action_input),
+                    },
                 )
             )
             self._log_step(state, state.steps[-1])
@@ -215,7 +236,8 @@ class Supervisor:
             used_tools=[
                 step.action
                 for step in state.steps
-                if step.action != "final_answer"
+                if not step.action.startswith("_")
+                and step.action != "final_answer"
             ],
             answer_preview=state.final_answer,
             elapsed_seconds=elapsed_seconds,
@@ -354,6 +376,18 @@ class Supervisor:
                 state.finish_with_answer(answer)
                 break
 
+            duplicate_guard_step = self._build_duplicate_guard_step(
+                state=state,
+                thought=thought,
+                action=action,
+                action_input=action_input,
+            )
+            if duplicate_guard_step is not None:
+                state.add_step(duplicate_guard_step)
+                self._log_step(state, duplicate_guard_step)
+                yield "status", {"message": "Đang dùng kết quả đã tra cứu..."}
+                continue
+
             next_step = state.step_count + 1
             yield "status", {
                 "message": TOOL_STATUS_MESSAGES.get(
@@ -372,6 +406,9 @@ class Supervisor:
                 tool_name=action,
                 success=not result.is_error,
                 result_preview=result.observation,
+                outcome=result.outcome,
+                retryable=result.retryable,
+                result_count=result.metadata.get("result_count"),
                 used_context=result.used_context,
                 low_confidence=result.low_confidence,
                 is_ask_user=result.is_ask_user,
@@ -382,11 +419,16 @@ class Supervisor:
                     action=action,
                     action_input=action_input,
                     observation=result.observation,
+                    outcome=result.outcome,
+                    retryable=result.retryable,
                     is_error=result.is_error,
                     citations=result.citations,
                     used_context=result.used_context,
                     low_confidence=result.low_confidence,
-                    metadata=result.metadata,
+                    metadata={
+                        **result.metadata,
+                        "tool_signature": self._tool_signature(action, action_input),
+                    },
                 )
             )
             self._log_step(state, state.steps[-1])
@@ -424,7 +466,8 @@ class Supervisor:
             used_tools=[
                 step.action
                 for step in state.steps
-                if step.action != "final_answer"
+                if not step.action.startswith("_")
+                and step.action != "final_answer"
             ],
             answer_preview=state.final_answer,
             elapsed_seconds=elapsed_seconds,
@@ -508,6 +551,95 @@ class Supervisor:
     @staticmethod
     def _ask_user_count(state: AgentState) -> int:
         return sum(1 for step in state.steps if step.action == "ask_user")
+
+    @classmethod
+    def _build_duplicate_guard_step(
+        cls,
+        *,
+        state: AgentState,
+        thought: str,
+        action: str,
+        action_input: dict[str, Any],
+    ) -> AgentStep | None:
+        signature = cls._tool_signature(action, action_input)
+        matching_steps = [
+            step
+            for step in state.steps
+            if not step.action.startswith("_")
+            and step.action != "final_answer"
+            and cls._step_tool_signature(step) == signature
+        ]
+        if not matching_steps:
+            return None
+
+        previous_step = matching_steps[-1]
+        if (
+            previous_step.outcome == "error"
+            and previous_step.retryable
+            and len(matching_steps) < MAX_RETRYABLE_TOOL_ATTEMPTS
+        ):
+            logger.info(
+                "Retrying transient tool error | action=%s attempt=%d",
+                action,
+                len(matching_steps) + 1,
+            )
+            return None
+
+        if previous_step.outcome in {"success", "empty"}:
+            reason = "tool đã trả về kết quả hợp lệ"
+        elif previous_step.retryable:
+            reason = "tool đã hết giới hạn retry một lần"
+        else:
+            reason = "lỗi tool không thể retry"
+
+        observation = (
+            f"⚠️ Không thực thi lại {action} với cùng input vì {reason}. "
+            "Hãy dùng Observation trước đó và trả final_answer; "
+            "chỉ gọi tool nếu thay đổi input có chủ đích.\n"
+            f"Observation trước: {previous_step.observation}"
+        )
+        logger.warning(
+            "Duplicate tool call blocked | action=%s outcome=%s retryable=%s attempts=%d",
+            action,
+            previous_step.outcome,
+            previous_step.retryable,
+            len(matching_steps),
+        )
+        return AgentStep(
+            thought=thought,
+            action=DUPLICATE_GUARD_ACTION,
+            action_input={
+                "blocked_action": action,
+                "blocked_action_input": action_input,
+            },
+            observation=observation,
+            outcome="error",
+            retryable=False,
+            is_error=True,
+            metadata={
+                "execution_skipped": True,
+                "blocked_action": action,
+                "blocked_signature": signature,
+                "previous_outcome": previous_step.outcome,
+            },
+        )
+
+    @staticmethod
+    def _tool_signature(action: str, action_input: dict[str, Any]) -> str:
+        return json.dumps(
+            {"action": action, "action_input": action_input},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+        )
+
+    @classmethod
+    def _step_tool_signature(cls, step: AgentStep) -> str:
+        stored_signature = step.metadata.get("tool_signature")
+        if isinstance(stored_signature, str) and stored_signature:
+            return stored_signature
+        return cls._tool_signature(step.action, step.action_input)
 
     async def _call_llm(
         self,
@@ -619,10 +751,13 @@ class Supervisor:
     def _log_step(state: AgentState, step: AgentStep) -> None:
         logger.info(
             "Supervisor step | step=%d action=%s is_error=%s "
-            "used_context=%s low_confidence=%s observation_length=%d",
+            "outcome=%s retryable=%s used_context=%s low_confidence=%s "
+            "observation_length=%d",
             state.step_count,
             step.action,
             step.is_error,
+            step.outcome,
+            step.retryable,
             step.used_context,
             step.low_confidence,
             len(step.observation or ""),

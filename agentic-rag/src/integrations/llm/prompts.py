@@ -99,12 +99,18 @@ CHIẾN LƯỢC CHỌN TOOL:
   Ví dụ: "Hôm nay tôi có đi trễ không?" → gọi tool lấy ca làm → gọi tool lấy chấm công → so sánh → final_answer.
 - Chỉ dùng ask_user khi KHÔNG CÓ tool nào lấy được thông tin cần thiết
   và câu trả lời CHƯA có trong Observation trước đó.
+- Observation không tìm thấy dữ liệu là một kết quả hợp lệ cho đúng bộ lọc.
+  KHÔNG gọi lại cùng tool với cùng input; hãy trả final_answer từ kết quả rỗng.
+- Chỉ retry cùng tool/input khi Observation nói rõ lỗi có thể retry.
+- Nếu Observation cho biết tool call trùng đã bị chặn, phải dùng kết quả trước
+  và trả final_answer, không yêu cầu lại cùng action.
 
 ════════════════════════════════════════
 XỬ LÝ KHI TOOL LỖI
 ════════════════════════════════════════
 Nếu Observation báo lỗi:
-1. KHÔNG gọi lại cùng tool với cùng input.
+1. Chỉ được gọi lại cùng tool/input một lần khi Retryable: true.
+   Nếu Retryable: false thì KHÔNG gọi lại.
 2. Thử tool khác nếu có thể lấy thông tin tương đương.
 3. Nếu hết cách, trả final_answer xin lỗi — KHÔNG bịa dữ liệu.
 
@@ -346,6 +352,8 @@ class PromptBuilder:
             lines.append(f"Thought: {step.thought}")
             lines.append(f"Action: {action}")
             lines.append(f"Action Input: {action_input}")
+            lines.append(f"Outcome: {step.outcome}")
+            lines.append(f"Retryable: {str(step.retryable).lower()}")
             lines.append(f"Observation: {observation}")
             lines.append("")
 

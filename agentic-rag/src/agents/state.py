@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, cast
+
 from src.features.chat.schemas import ChatHistoryTurn
-from src.tools.base_tool import ToolCitation
+from src.tools.base_tool import ToolCitation, ToolOutcome
+
 
 @dataclass
 class AgentStep:
@@ -11,6 +13,8 @@ class AgentStep:
     action: str                     # tên tool: "vector_search", "employee_query", "ask_user", ...
     action_input: dict[str, Any]    # params truyền vào tool.run(**action_input)
     observation: str                # kết quả tool trả về — Supervisor append vào prompt loop kế tiếp
+    outcome: ToolOutcome = "success"
+    retryable: bool = False
     is_error: bool = False
     citations: list[ToolCitation] = field(default_factory=list)
     used_context: bool = False
@@ -23,6 +27,8 @@ class AgentStep:
             "action": self.action,
             "action_input": self.action_input,
             "observation": self.observation,
+            "outcome": self.outcome,
+            "retryable": self.retryable,
             "is_error": self.is_error,
             "citations": [
                 {
@@ -60,12 +66,22 @@ class AgentStep:
             for item in data.get("citations", [])
             if isinstance(item, dict)
         ]
+        is_error = bool(data.get("is_error", False))
+        outcome_value = str(
+            data.get("outcome") or ("error" if is_error else "success")
+        )
+        if outcome_value not in {"success", "empty", "error"}:
+            outcome_value = "error" if is_error else "success"
+        outcome = cast(ToolOutcome, outcome_value)
+
         return cls(
             thought=str(data.get("thought") or ""),
             action=str(data["action"]),
             action_input=dict(data.get("action_input") or {}),
             observation=str(data.get("observation") or ""),
-            is_error=bool(data.get("is_error", False)),
+            outcome=outcome,
+            retryable=bool(data.get("retryable", False)),
+            is_error=is_error,
             citations=citations,
             used_context=bool(data.get("used_context", False)),
             low_confidence=bool(data.get("low_confidence", False)),

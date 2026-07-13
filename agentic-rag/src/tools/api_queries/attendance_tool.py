@@ -7,10 +7,10 @@ from pydantic import ValidationError
 
 from src.integrations.api_service.clients import APIServiceClient
 from src.integrations.api_service.schemas import AttendanceRecordListQuery
-from src.tools.api_queries.errors import format_api_error
+from src.tools.api_queries.errors import build_api_error_result
 from src.tools.api_queries.formatters import format_attendance_records
 from src.tools.api_queries.schemas import AttendanceQueryInput
-from src.tools.base_tool import BaseTool
+from src.tools.base_tool import BaseTool, ToolResult
 from src.utils.enums import AttendanceEventType, AttendanceRecordStatus, AttendanceSource
 
 
@@ -54,7 +54,7 @@ class AttendanceQueryTool(BaseTool):
         accepted: bool | None = None,
         event_time_from: datetime | None = None,
         event_time_to: datetime | None = None,
-    ) -> str:
+    ) -> ToolResult:
         try:
             query = AttendanceRecordListQuery(
                 page=page,
@@ -72,7 +72,7 @@ class AttendanceQueryTool(BaseTool):
             )
             records = await self.api_service_client.list_attendance_records(query)
         except (ValidationError, httpx.HTTPError) as exc:
-            return format_api_error(exc)
+            return build_api_error_result(exc)
 
         output = format_attendance_records(records, query)
         ignored_filters: list[str] = []
@@ -85,4 +85,20 @@ class AttendanceQueryTool(BaseTool):
                 "\n\nLưu ý: attendance_query hiện dùng attendance_records chính thức; "
                 f"đã bỏ qua filter raw event: {', '.join(ignored_filters)}."
             )
-        return output
+        if not records:
+            return ToolResult(
+                observation=output,
+                outcome="empty",
+                metadata={
+                    "result_count": 0,
+                    "query_complete": True,
+                },
+            )
+
+        return ToolResult(
+            observation=output,
+            metadata={
+                "result_count": len(records),
+                "query_complete": len(records) < query.page_size,
+            },
+        )

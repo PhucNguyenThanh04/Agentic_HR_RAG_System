@@ -46,7 +46,9 @@ class VectorSearchTool(BaseTool):
         query = query.strip()
         if not query:
             return ToolResult(
-                observation="Không có truy vấn để tìm kiếm trong tài liệu nội bộ."
+                observation="Không có truy vấn để tìm kiếm trong tài liệu nội bộ.",
+                outcome="error",
+                retryable=False,
             )
 
         result = await self._retrieve_best_context(query)
@@ -54,8 +56,10 @@ class VectorSearchTool(BaseTool):
         if not result.used_context or not result.chunks:
             return ToolResult(
                 observation="Không tìm thấy thông tin phù hợp trong tài liệu nội bộ.",
+                outcome="empty",
                 used_context=False,
                 low_confidence=result.low_confidence,
+                metadata={"result_count": 0, "query_complete": True},
             )
 
         return ToolResult(
@@ -76,7 +80,11 @@ class VectorSearchTool(BaseTool):
             ],
             used_context=True,
             low_confidence=result.low_confidence,
-            metadata={"tool": self.name},
+            metadata={
+                "tool": self.name,
+                "result_count": len(result.chunks),
+                "query_complete": True,
+            },
         )
 
     async def _retrieve_best_context(self, query: str) -> RetrievalPipelineResult:
