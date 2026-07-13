@@ -369,17 +369,3 @@ curl -N -X POST http://localhost:8000/api/v1/chat/<conversation_id>/messages/str
 | agentic-rag | `8081` | `8081` | Agentic Service. |
 | web-dashboard | `5173` | N/A | Vite dev server khi chạy local. |
 
-## Roadmap
-
-- [ ] Thêm `agentic-rag/.env.example` đồng bộ với `src/core/settings.py`.
-- [ ] Thêm screenshot/GIF dashboard vào README.
-- [ ] Chuẩn hóa metrics README với output mới trong `agentic-rag/eval/results/metrics_summary.json`.
-- [ ] Thêm CI chạy lint/test/build cho 3 service.
-
-## License / Contributing / Contact
-
-**License:** TBD. Repo hiện chưa có file `LICENSE`.
-
-**Contributing:** issue/PR welcome. Khi thêm feature Agent/RAG, nên kèm test hoặc eval case cho tool dispatch và retrieval.
-
-**Contact:** TODO.
