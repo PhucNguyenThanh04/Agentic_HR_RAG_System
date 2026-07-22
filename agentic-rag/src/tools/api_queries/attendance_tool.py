@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+import uuid
+from datetime import date
 
 import httpx
 from pydantic import ValidationError
@@ -11,20 +12,20 @@ from src.tools.api_queries.errors import build_api_error_result
 from src.tools.api_queries.formatters import format_attendance_records
 from src.tools.api_queries.schemas import AttendanceQueryInput
 from src.tools.base_tool import BaseTool, ToolResult
-from src.utils.enums import AttendanceEventType, AttendanceRecordStatus, AttendanceSource
+from src.utils.enums import AttendanceRecordStatus, AttendanceSource
 
 
 class AttendanceQueryTool(BaseTool):
     name = "attendance_query"
     description = (
-        "Tra cứu attendance record chính thức của nhân viên hiện tại từ api-service. "
+        "Tra cứu attendance record chính thức theo scope của actor. "
         "Dùng khi user hỏi ngày công, check-in/check-out, đi trễ, về sớm, số phút làm việc, "
         "trạng thái chấm công hoặc dữ liệu công trong một khoảng ngày. "
-        "Không nhận employee_id từ LLM và không truy vấn nhân viên khác."
+        "Bỏ trống employee_id cho chính actor; API kiểm tra mọi target khác."
     )
-    usage_hint = "Tra cứu chấm công, check-in/out, đi trễ/về sớm."
+    usage_hint = "Tra cứu chấm công của actor hoặc nhân viên đích được policy cho phép."
     input_example = (
-        '{"work_date_from":"YYYY-MM-DD",'
+        '{"employee_id":"UUID","work_date_from":"YYYY-MM-DD",'
         '"work_date_to":"YYYY-MM-DD",'
         '"status":"present|late|early_leave|late_and_early_leave|absent|on_leave|'
         'holiday|missing_check_in|missing_check_out|manually_edited"} hoặc {}'
@@ -36,13 +37,16 @@ class AttendanceQueryTool(BaseTool):
         api_service_client: APIServiceClient,
         employee_id: str,
         user_role: str,
+        access_token: str,
     ) -> None:
         self.api_service_client = api_service_client
         self.employee_id = employee_id
         self.user_role = user_role
+        self.access_token = access_token
 
     async def run(
         self,
+        employee_id: uuid.UUID | str | None = None,
         page: int = 1,
         page_size: int = 20,
         shift_id: int | None = None,
@@ -50,41 +54,27 @@ class AttendanceQueryTool(BaseTool):
         work_date_to: date | None = None,
         status: AttendanceRecordStatus | None = None,
         source: AttendanceSource | None = None,
-        event_type: AttendanceEventType | None = None,
-        accepted: bool | None = None,
-        event_time_from: datetime | None = None,
-        event_time_to: datetime | None = None,
     ) -> ToolResult:
+        target_employee_id = str(employee_id or self.employee_id)
         try:
             query = AttendanceRecordListQuery(
                 page=page,
                 page_size=page_size,
-                employee_id=self.employee_id,
+                employee_id=target_employee_id,
                 shift_id=shift_id,
-                work_date_from=work_date_from or (
-                    event_time_from.date() if event_time_from else None
-                ),
-                work_date_to=work_date_to or (
-                    event_time_to.date() if event_time_to else None
-                ),
+                work_date_from=work_date_from,
+                work_date_to=work_date_to,
                 status=status,
                 source=source,
             )
-            records = await self.api_service_client.list_attendance_records(query)
+            records = await self.api_service_client.list_attendance_records(
+                query,
+                access_token=self.access_token,
+            )
         except (ValidationError, httpx.HTTPError) as exc:
             return build_api_error_result(exc)
 
         output = format_attendance_records(records, query)
-        ignored_filters: list[str] = []
-        if event_type is not None:
-            ignored_filters.append("event_type")
-        if accepted is not None:
-            ignored_filters.append("accepted")
-        if ignored_filters:
-            output += (
-                "\n\nLưu ý: attendance_query hiện dùng attendance_records chính thức; "
-                f"đã bỏ qua filter raw event: {', '.join(ignored_filters)}."
-            )
         if not records:
             return ToolResult(
                 observation=output,

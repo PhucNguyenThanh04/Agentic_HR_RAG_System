@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from datetime import date
 
 import httpx
@@ -15,13 +16,13 @@ from src.tools.base_tool import BaseTool, ToolResult
 class ShiftQueryTool(BaseTool):
     name = "shift_query"
     description = (
-        "Tra cứu ca làm của nhân viên hiện tại từ api-service. "
+        "Tra cứu ca làm từ api-service theo scope của actor. "
         "Dùng khi user hỏi hôm nay/ở một ngày cụ thể làm ca nào, giờ bắt đầu/kết thúc, "
         "ngưỡng đi trễ/về sớm hoặc số phút làm việc yêu cầu. "
-        "Không nhận employee_id từ LLM và không truy vấn nhân viên khác."
+        "Bỏ trống employee_id cho chính actor; API kiểm tra mọi target khác."
     )
-    usage_hint = "Tra cứu ca làm hoặc lịch làm việc."
-    input_example = '{"as_of":"YYYY-MM-DD"} hoặc {}'
+    usage_hint = "Tra cứu ca làm của actor hoặc nhân viên đích được policy cho phép."
+    input_example = '{"as_of":"YYYY-MM-DD"} hoặc {"employee_id":"UUID"}'
     args_schema = ShiftQueryInput
 
     def __init__(
@@ -29,22 +30,30 @@ class ShiftQueryTool(BaseTool):
         api_service_client: APIServiceClient,
         employee_id: str,
         user_role: str,
+        access_token: str,
     ) -> None:
         self.api_service_client = api_service_client
         self.employee_id = employee_id
         self.user_role = user_role
+        self.access_token = access_token
 
-    async def run(self, as_of: date | None = None) -> ToolResult:
+    async def run(
+        self,
+        employee_id: uuid.UUID | str | None = None,
+        as_of: date | None = None,
+    ) -> ToolResult:
+        target_employee_id = str(employee_id or self.employee_id)
         try:
             current_shift = await self.api_service_client.get_employee_current_shift(
-                employee_id=self.employee_id,
+                employee_id=target_employee_id,
                 as_of=as_of,
+                access_token=self.access_token,
             )
         except (ValidationError, httpx.HTTPError) as exc:
             return build_api_error_result(
                 exc,
                 not_found_observation=(
-                    "Không tìm thấy ca làm của nhân viên trong ngày được yêu cầu."
+                    "Không tìm thấy ca làm của nhân viên được yêu cầu trong ngày này."
                 ),
             )
 

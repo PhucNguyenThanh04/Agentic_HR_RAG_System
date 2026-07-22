@@ -1,0 +1,46 @@
+{
+  "total_samples": 32,
+  "ask_user_rate": 0.0,
+  "not_done_rate": 0.0,
+  "avg_steps": 2.29,
+  "latency_ms": {
+    "mean": 18451.1,
+    "p50": 10282.0,
+    "p95": 51428.5,
+    "min": 6863.0,
+    "max": 63708.0
+  },
+  "tool_selection": {
+    "total": 32,
+    "first_call_accuracy": 0.9688,
+    "any_call_accuracy": 0.9688
+  },
+  "correctness": {
+    "graded": 2,
+    "ungraded": 30,
+    "accuracy": 0.0
+  },
+  "breakdown_by_expected_tool": {
+    "vector_search": {
+      "count": 32,
+      "tool_selection": {
+        "total": 32,
+        "first_call_accuracy": 0.9688,
+        "any_call_accuracy": 0.9688
+      },
+      "correctness": {
+        "graded": 2,
+        "ungraded": 30,
+        "accuracy": 0.0
+      },
+      "avg_steps": 2.29,
+      "latency_ms": {
+        "mean": 18451.1,
+        "p50": 10282.0,
+        "p95": 51428.5,
+        "min": 6863.0,
+        "max": 63708.0
+      }
+    }
+  }
+}

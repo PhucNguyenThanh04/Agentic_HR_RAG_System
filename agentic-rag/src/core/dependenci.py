@@ -1,5 +1,5 @@
-from fastapi import Request, HTTPException, Security
-from fastapi.security import APIKeyHeader
+from fastapi import HTTPException, Request, Security, status
+from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 from src.rag.ingestion.pipeline import IngestionPipeline
 from src.rag.embeddings.embedding_service import EmbeddingService
 from src.integrations.qdrant.store import QdrantVectorStore
@@ -12,11 +12,29 @@ from src.integrations.api_service.clients import APIServiceClient
 settings = get_settings()
 
 _api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+_user_bearer = HTTPBearer(auto_error=False)
 
 
 async def verify_api_key(api_key: str = Security(_api_key_header)):
     if api_key != settings.rag_api_key:
         raise HTTPException(status_code=403, detail="Invalid API key")
+
+
+async def get_user_access_token(
+    credentials: HTTPAuthorizationCredentials | None = Security(_user_bearer),
+) -> str:
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing user access token",
+        )
+    token = credentials.credentials.strip()
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing user access token",
+        )
+    return token
 
 
 def get_embedding_service(request: Request) -> EmbeddingService:

@@ -1,0 +1,13 @@
+{
+  "faithfulness": 0.9004619758351102,
+  "answer_relevancy": 0.8018483564784575,
+  "context_precision": 0.9490049750389709,
+  "context_recall": 0.9075456053067993,
+  "n_total": 68,
+  "n_valid": 68,
+  "n_evaluated": 67,
+  "n_failed": 0,
+  "n_completed": 67,
+  "n_skipped": 0,
+  "n_remaining": 1
+}

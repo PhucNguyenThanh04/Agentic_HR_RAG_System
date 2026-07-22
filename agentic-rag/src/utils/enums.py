@@ -40,12 +40,6 @@ class FaceImageStatus(str, enum.Enum):
 
 # ── Attendance ─────────────────────────────────────────────────────────────
 
-class AttendanceEventType(str, enum.Enum):
-    check_in = "check_in"
-    check_out = "check_out"
-    unknown = "unknown"
-
-
 class AttendanceRecordStatus(str, enum.Enum):
     present = "present"
     late = "late"

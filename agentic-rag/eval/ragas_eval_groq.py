@@ -80,19 +80,19 @@ def ragas_uses_legacy_schema() -> bool:
 
 
 def build_evaluator_models() -> tuple[Any, Any] | tuple[None, None]:
-    """Build Gemini judge LLM and BGE-M3 embeddings for RAGAS."""
+    """Build Groq judge LLM and BGE-M3 embeddings for RAGAS."""
     load_dotenv(PROJECT_ROOT / ".env")
 
-    google_api_key = os.getenv("GOOGLE_API_KEY")
-    if not google_api_key:
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    if not groq_api_key:
         return None, None
 
     try:
-        from langchain_google_genai import ChatGoogleGenerativeAI
+        from langchain_groq import ChatGroq
     except ImportError as exc:
         raise RuntimeError(
-            "GOOGLE_API_KEY đã có nhưng thiếu package langchain_google_genai. "
-            "Cài thêm: pip install langchain-google-genai"
+            "GROQ_API_KEY đã có nhưng thiếu package langchain_groq. "
+            "Cài thêm: pip install langchain-groq"
         ) from exc
 
     try:
@@ -107,9 +107,9 @@ def build_evaluator_models() -> tuple[Any, Any] | tuple[None, None]:
             ) from exc
 
     llm_model = (
-        os.getenv("RAGAS_GEMINI_MODEL")
-        or os.getenv("GEMINI_MODEL")
-        or "gemini-1.5-flash"
+        os.getenv("RAGAS_GROQ_MODEL")
+        or os.getenv("GROQ_MODEL")
+        or "llama-3.3-70b-versatile"
     )
     embedding_model = (
         os.getenv("RAGAS_EMBEDDING_MODEL")
@@ -124,9 +124,9 @@ def build_evaluator_models() -> tuple[Any, Any] | tuple[None, None]:
     temperature = float(os.getenv("RAGAS_LLM_TEMPERATURE", os.getenv("LLM_TEMPERATURE", "0")))
     timeout = float(os.getenv("RAGAS_LLM_TIMEOUT", os.getenv("LLM_TIMEOUT", "60")))
 
-    llm = ChatGoogleGenerativeAI(
+    llm = ChatGroq(
         model=llm_model,
-        google_api_key=google_api_key,
+        groq_api_key=groq_api_key,
         temperature=temperature,
         timeout=timeout,
     )

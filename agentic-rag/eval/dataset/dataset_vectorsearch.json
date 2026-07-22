@@ -1,0 +1,639 @@
+[
+  {
+    "question": "Theo quy định pháp luật, người lao động được định nghĩa như thế nào và độ tuổi tối thiểu là bao nhiêu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động là người làm việc cho người sử dụng lao động theo thỏa thuận, được trả lương và chịu sự quản lý, điều hành, giám sát của người sử dụng lao động. Độ tuổi lao động tối thiểu của người lao động là đủ 15 tuổi, trừ trường hợp quy định tại Mục 1 Chương XI của Bộ luật này.",
+    "source_reference": "Điều 3, Khoản 1"
+  },
+  {
+    "question": "Thế nào được coi là hành vi cưỡng bức lao động trong quan hệ lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Cưỡng bức lao động là việc dùng vũ lực, đe dọa dùng vũ lực hoặc các thủ đoạn khác để ép buộc người lao động phải làm việc trái ý muốn của họ.",
+    "source_reference": "Điều 3, Khoản 7"
+  },
+  {
+    "question": "Quấy rối tình dục tại nơi làm việc là gì và phạm vi 'nơi làm việc' được hiểu như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Quấy rối tình dục tại nơi làm việc là hành vi có tính chất tình dục của bất kỳ người nào đối với người khác tại nơi làm việc mà không được người đó mong muốn hoặc chấp nhận. Nơi làm việc là bất kỳ nơi nào mà người lao động thực tế làm việc theo thỏa thuận hoặc phân công của người sử dụng lao động.",
+    "source_reference": "Điều 3, Khoản 9"
+  },
+  {
+    "question": "Người lao động có bắt buộc phải ký hợp đồng bằng văn bản giấy không, ký hợp đồng điện tử có giá trị pháp lý không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Hợp đồng lao động phải được giao kết bằng văn bản và được làm thành 02 bản, mỗi bên giữ 01 bản. Hợp đồng lao động được giao kết thông qua phương tiện điện tử dưới hình thức thông điệp dữ liệu theo quy định của pháp luật về giao dịch điện tử có giá trị như hợp đồng lao động bằng văn bản.",
+    "source_reference": "Điều 14, Khoản 1"
+  },
+  {
+    "question": "Khi giao kết hợp đồng lao động, doanh nghiệp có được giữ bằng gốc hoặc yêu cầu đặt cọc tiền không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người sử dụng lao động không được thực hiện các hành vi sau: 1. Giữ bản chính giấy tờ tùy thân, văn bằng, chứng chỉ của người lao động. 2. Yêu cầu người lao động phải thực hiện biện pháp bảo đảm bằng tiền hoặc tài sản khác cho việc thực hiện hợp đồng lao động. 3. Buộc người lao động thực hiện hợp đồng lao động để trả nợ cho người sử dụng lao động.",
+    "source_reference": "Điều 17"
+  },
+  {
+    "question": "Hợp đồng lao động có hiệu lực từ thời điểm nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Hợp đồng lao động có hiệu lực kể từ ngày hai bên giao kết, trừ trường hợp hai bên có thỏa thuận hoặc pháp luật có quy định khác.",
+    "source_reference": "Điều 23"
+  },
+  {
+    "question": "Thời gian thử việc tối đa cho công việc yêu cầu trình độ từ cao đẳng trở lên và trình độ trung cấp là bao lâu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "B",
+    "ground_truth": "Thời gian thử việc do hai bên thỏa thuận căn cứ vào tính chất, mức độ phức tạp của công việc nhưng chỉ được thử việc một lần đối với một công việc và bảo đảm: Không quá 60 ngày đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn, kỹ thuật từ cao đẳng trở lên; Không quá 30 ngày đối với công việc cần trình độ chuyên môn, kỹ thuật trung cấp, công nhân kỹ thuật, nhân viên nghiệp vụ.",
+    "source_reference": "Điều 25, Khoản 2, Khoản 3"
+  },
+  {
+    "question": "Mức lương của nhân viên trong thời gian thử việc được luật quy định tối thiểu là bao nhiêu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Tiền lương của người lao động trong thời gian thử việc do hai bên thỏa thuận nhưng ít nhất phải bằng 85% mức lương của công việc đó.",
+    "source_reference": "Điều 26"
+  },
+  {
+    "question": "Đang trong quá trình thử việc, nếu cảm thấy không phù hợp tôi có thể nghỉ việc ngay mà không cần báo trước không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Trong thời gian thử việc, mỗi bên có quyền hủy bỏ hợp đồng thử việc hoặc hợp đồng lao động đã giao kết mà không cần báo trước và không phải bồi thường.",
+    "source_reference": "Điều 27, Khoản 2"
+  },
+  {
+  
+    "question": "Người lao động có quyền đơn phương chấm dứt hợp đồng không cần báo trước trong những trường hợp nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "B",
+    "ground_truth": "Người lao động có quyền đơn phương chấm dứt hợp đồng lao động không cần báo trước trong các trường hợp: Không được bố trí đúng công việc, địa điểm hoặc bảo đảm điều kiện làm việc; Không được trả đủ lương hoặc trả lương không đúng hạn; Bị ngược đãi, đánh đập, nhục mạ; Bị quấy rối tình dục tại nơi làm việc; Lao động nữ mang thai phải nghỉ việc theo chỉ định; Đủ tuổi nghỉ hưu; Người sử dụng lao động cung cấp thông tin không trung thực khi giao kết hợp đồng.",
+    "source_reference": "Điều 35, Khoản 2"
+  },
+  {
+  
+    "question": "Doanh nghiệp không được đơn phương chấm dứt hợp đồng lao động đối với người lao động trong những trường hợp nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "B",
+    "ground_truth": "Người sử dụng lao động không được thực hiện quyền đơn phương chấm dứt hợp đồng lao động khi: 1. Người lao động ốm đau, tai nạn, bệnh nghề nghiệp đang điều trị, điều dưỡng theo chỉ định. 2. Người lao động đang nghỉ hằng năm, nghỉ việc riêng hoặc trường hợp nghỉ khác được đồng ý. 3. Người lao động nữ mang thai, người lao động đang nghỉ thai sản hoặc nuôi con dưới 12 tháng tuổi.",
+    "source_reference": "Điều 37"
+  },
+  {
+  
+    "question": "Trường hợp người lao động tự ý bỏ việc liên tục từ 05 ngày trở lên thì người sử dụng lao động xử lý như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người sử dụng lao động có quyền đơn phương chấm dứt hợp đồng lao động mà không cần báo trước nếu người lao động tự ý bỏ việc mà không có lý do chính đáng từ 05 ngày làm việc liên tục trở lên.",
+    "source_reference": "Điều 36, Khoản 1 Điểm e, Khoản 3"
+  },
+  {
+  
+    "question": "Cơ quan nào có thẩm quyền tuyên bố một hợp đồng lao động bị vô hiệu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Tòa án nhân dân có quyền tuyên bố hợp đồng lao động vô hiệu.",
+    "source_reference": "Điều 50"
+  },
+  {
+  
+    "question": "Trong thời gian tham gia học nghề, tập nghề tại doanh nghiệp, người học nghề có được trả lương không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Trong thời gian học nghề, tập nghề, nếu người học nghề, người tập nghề trực tiếp hoặc tham gia lao động thì được người sử dụng lao động trả lương theo mức do hai bên thỏa thuận.",
+    "source_reference": "Điều 61, Khoản 5"
+  },
+  {
+  
+    "question": "Thương lượng tập thể phải tuân thủ những nguyên tắc nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Thương lượng tập thể được tiến hành theo nguyên tắc tự nguyện, hợp tác, thiện chí, bình đẳng, công khai và minh bạch.",
+    "source_reference": "Điều 66"
+  },
+  {
+  
+    "question": "Thời hạn gửi Thỏa ước lao động tập thể đã ký kết lên cơ quan quản lý nhà nước về lao động là bao lâu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Trong thời hạn 10 ngày kể từ ngày thỏa ước lao động tập thể được ký kết, người sử dụng lao động tham gia thỏa ước phải gửi 01 bản thỏa ước lao động tập thể đến cơ quan chuyên môn về lao động thuộc Ủy ban nhân dân cấp tỉnh nơi đặt trụ sở chính.",
+    "source_reference": "Điều 77"
+  },
+  {
+  
+    "question": "Thỏa ước lao động tập thể có thời hạn tối thiểu và tối đa là bao lâu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Thỏa ước lao động tập thể có thời hạn từ 01 năm đến 03 năm. Thời hạn cụ thể do các bên thỏa thuận và ghi trong thỏa ước lao động tập thể.",
+    "source_reference": "Điều 78, Khoản 3"
+  },
+  {
+  
+    "question": "Mọi chi phí liên quan đến thương lượng, sửa đổi và ký kết thỏa ước lao động tập thể do bên nào chi trả?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Mọi chi phí cho việc thương lượng, ký kết, sửa đổi, bổ sung, gửi và công bố thỏa ước lao động tập thể do phía người sử dụng lao động chi trả.",
+    "source_reference": "Điều 89"
+  },
+  {
+  
+    "question": "Người lao động làm thêm giờ vào ngày nghỉ hằng tuần hoặc ngày lễ, tết được tính lương như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "B",
+    "ground_truth": "Người lao động làm thêm giờ được trả lương tính theo đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm như sau: Vào ngày nghỉ hằng tuần, ít nhất bằng 200%; Vào ngày nghỉ lễ, tết, ngày nghỉ có hưởng lương, ít nhất bằng 300% chưa kể tiền lương ngày lễ, tết, ngày nghỉ có hưởng lương đối với người lao động hưởng lương ngày.",
+    "source_reference": "Điều 98, Khoản 1 Điểm b, c"
+  },
+  {
+  
+    "question": "Hàng tháng, doanh nghiệp được phép khấu trừ tiền lương tối đa là bao nhiêu phần trăm lương thực trả của nhân viên?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Mức khấu trừ tiền lương hằng tháng không được quá 30% tiền lương thực trả hằng tháng của người lao động sau khi trích nộp các khoản bảo hiểm xã hội bắt buộc, bảo hiểm y tế, bảo hiểm thất nghiệp, thuế thu nhập cá nhân.",
+    "source_reference": "Điều 102, Khoản 3"
+  },
+  {
+  
+    "question": "Khi làm việc theo ca, người lao động phải được nghỉ tối thiểu bao nhiêu giờ trước khi chuyển sang ca làm việc khác?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động làm việc theo ca được nghỉ ít nhất 12 giờ trước khi chuyển sang ca làm việc khác.",
+    "source_reference": "Điều 110"
+  },
+  {
+  
+    "question": "Có các hình thức xử lý kỷ luật lao động nào được luật pháp thừa nhận?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Các hình thức xử lý kỷ luật lao động bao gồm: 1. Khiển trách. 2. Kéo dài thời hạn nâng lương không quá 06 tháng. 3. Cách chức. 4. Sa thải.",
+    "source_reference": "Điều 124"
+  },
+  {
+  
+    "question": "Thời hạn tạm đình chỉ công việc đối với nhân viên để xác minh vi phạm tối đa là bao nhiêu ngày?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Thời hạn tạm đình chỉ công việc không được quá 15 ngày, trường hợp đặc biệt không được quá 90 ngày. Trong thời gian bị tạm đình chỉ công việc, người lao động được tạm ứng 50% tiền lương trước khi bị đình chỉ công việc.",
+    "source_reference": "Điều 128, Khoản 2"
+  },
+  {
+  
+    "question": "Thời gian nghỉ thai sản của lao động nữ được quy định như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con là 06 tháng; thời gian nghỉ trước khi sinh không quá 02 tháng. Trường hợp lao động nữ sinh đôi trở lên thì tính từ con thứ 02 trở đi, cứ mỗi con, người mẹ được nghỉ thêm 01 tháng.",
+    "source_reference": "Điều 139, Khoản 1"
+  },
+  {
+  
+    "question": "Tuổi nghỉ hưu của người lao động trong điều kiện bình thường được quy định và điều chỉnh theo lộ trình thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "B",
+    "ground_truth": "Tuổi nghỉ hưu của người lao động trong điều kiện lao động bình thường được điều chỉnh theo lộ trình cho đến khi đủ 62 tuổi đối với lao động nam vào năm 2028 và đủ 60 tuổi đối với lao động nữ vào năm 2035. Kể từ năm 2021, tuổi nghỉ hưu là đủ 60 tuổi 03 tháng đối với nam và đủ 55 tuổi 04 tháng đối với nữ; sau đó, cứ mỗi năm tăng thêm 03 tháng đối với nam và 04 tháng đối với nữ.",
+    "source_reference": "Điều 169, Khoản 2"
+  },
+  {
+    "question": "Theo quy định pháp luật, người lao động được định nghĩa như thế nào và độ tuổi tối thiểu là bao nhiêu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động là người làm việc cho người sử dụng lao động theo thỏa thuận, được trả lương và chịu sự quản lý, điều hành, giám sát của người sử dụng lao động. Độ tuổi lao động tối thiểu của người lao động là đủ 15 tuổi, trừ trường hợp quy định tại Mục 1 Chương XI của Bộ luật này.",
+    "source_reference": "Điều 3, Khoản 1"
+  },
+  {
+    "question": "Người sử dụng lao động được định nghĩa như thế nào trong Bộ luật Lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người sử dụng lao động là doanh nghiệp, cơ quan, tổ chức, hợp tác xã, hộ gia đình, cá nhân có thuê mướn, sử dụng người lao động làm việc cho mình theo thỏa thuận; trường hợp người sử dụng lao động là cá nhân thì phải có năng lực hành vi dân sự đầy đủ.",
+    "source_reference": "Điều 3, Khoản 2"
+  },
+  {
+    "question": "Thế nào là hành vi cưỡng bức lao động theo quy định của pháp luật?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Cưỡng bức lao động là việc dùng vũ lực, đe dọa dùng vũ lực hoặc các thủ đoạn khác để ép buộc người lao động phải làm việc trái ý muốn của họ.",
+    "source_reference": "Điều 3, Khoản 7"
+  },
+  {
+    "question": "Phân biệt đối xử trong lao động được giải thích như thế nào và trường hợp nào không bị xem là phân biệt đối xử?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Phân biệt đối xử trong lao động là hành vi phân biệt, loại trừ hoặc ưu tiên dựa trên chủng tộc, màu da, nguồn gốc quốc gia hoặc nguồn gốc xã hội, dân tộc, giới tính, độ tuổi, tình trạng thai sản, tình trạng hôn nhân, tôn giáo, tín ngưỡng, chính kiến, khuyết tật, trách nhiệm gia đình hoặc trên cơ sở tình trạng nhiễm HIV hoặc vì lý do thành lập, gia nhập và hoạt động công đoàn, tổ chức của người lao động tại doanh nghiệp có tác động làm ảnh hưởng đến bình đẳng về cơ hội việc làm hoặc nghề nghiệp. Việc phân biệt, loại trừ hoặc ưu tiên xuất phát từ yêu cầu đặc thù của công việc và các hành vi duy trì, bảo vệ việc làm cho người lao động dễ bị tổn thương thì không bị xem là phân biệt đối xử.",
+    "source_reference": "Điều 3, Khoản 8"
+  },
+  {
+    "question": "Hành vi quấy rối tình dục tại nơi làm việc và khái niệm 'nơi làm việc' được quy định như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Quấy rối tình dục tại nơi làm việc là hành vi có tính chất tình dục của bất kỳ người nào đối với người khác tại nơi làm việc mà không được người đó mong muốn hoặc chấp nhận. Nơi làm việc là bất kỳ nơi nào mà người lao động thực tế làm việc theo thỏa thuận hoặc phân công của người sử dụng lao động.",
+    "source_reference": "Điều 3, Khoản 9"
+  },
+  {
+    "question": "Người lao động có những quyền lợi cơ bản nào được pháp luật bảo vệ?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động có các quyền sau: Làm việc; tự do lựa chọn việc làm, nghề nghiệp, học nghề; hưởng lương phù hợp với trình độ, kỹ năng nghề; được bảo hộ lao động, làm việc trong điều kiện an toàn, vệ sinh lao động; nghỉ theo chế độ, nghỉ hằng năm có hưởng lương và hưởng phúc lợi tập thể; thành lập, gia nhập, hoạt động trong tổ chức đại diện người lao động; từ chối làm việc nếu có nguy cơ rõ ràng đe dọa trực tiếp đến tính mạng, sức khỏe; đơn phương chấm dứt hợp đồng lao động; đình công; và các quyền khác.",
+    "source_reference": "Điều 5, Khoản 1"
+  },
+  {
+    "question": "Người lao động phải thực hiện những nghĩa vụ gì theo quy định?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động có nghĩa vụ: Thực hiện hợp đồng lao động, thỏa ước lao động tập thể và thỏa thuận hợp pháp khác; chấp hành kỷ luật lao động, nội quy lao động; tuân theo sự quản lý, điều hành, giám sát của người sử dụng lao động; thực hiện quy định của pháp luật về lao động, việc làm, giáo dục nghề nghiệp, bảo hiểm xã hội, bảo hiểm y tế, bảo hiểm thất nghiệp và an toàn, vệ sinh lao động.",
+    "source_reference": "Điều 5, Khoản 2"
+  },
+  {
+    "question": "Những hành vi nào bị nghiêm cấm hoàn toàn trong lĩnh vực lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Các hành vi bị nghiêm cấm bao gồm: Phân biệt đối xử trong lao động; ngược đãi người lao động, cưỡng bức lao động; quấy rối tình dục tại nơi làm việc; lợi dụng danh nghĩa dạy nghề, tập nghề để trục lợi, bóc lột; sử dụng lao động chưa qua đào tạo đối với nghề yêu cầu chuyên môn; lôi kéo, lừa gạt tuyển dụng lao động với mục đích mua bán người, bóc lột; sử dụng lao động chưa thành niên trái pháp luật.",
+    "source_reference": "Điều 8"
+  },
+  {
+    "question": "Pháp luật quy định thế nào về quyền làm việc và tự do lựa chọn việc làm của người lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động được tự do lựa chọn việc làm, làm việc cho bất kỳ người sử dụng lao động nào và ở bất kỳ nơi nào mà pháp luật không cấm. Được trực tiếp liên hệ hoặc thông qua tổ chức dịch vụ việc làm để tìm kiếm việc làm theo nguyện vọng, khả năng, trình độ nghề nghiệp và sức khỏe.",
+    "source_reference": "Điều 10"
+  },
+  {
+    "question": "Người lao động có phải trả chi phí cho việc tuyển dụng lao động không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động không phải trả chi phí cho việc tuyển dụng lao động.",
+    "source_reference": "Điều 11, Khoản 2"
+  },
+  {
+    "question": "Thế nào là hợp đồng lao động và trường hợp thỏa thuận bằng tên gọi khác thì có được coi là hợp đồng lao động không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Hợp đồng lao động là sự thỏa thuận giữa người lao động và người sử dụng lao động về việc làm có trả công, tiền lương, điều kiện lao động, quyền và nghĩa vụ của mỗi bên. Trường hợp thỏa thuận bằng tên gọi khác nhưng có nội dung thể hiện về việc làm có trả công, tiền lương và sự quản lý, điều hành, giám sát của một bên thì vẫn được coi là hợp đồng lao động.",
+    "source_reference": "Điều 13, Khoản 1"
+  },
+  {
+    "question": "Hình thức giao kết hợp đồng lao động được quy định như thế nào? Hợp đồng điện tử có giá trị pháp lý không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Hợp đồng lao động phải được giao kết bằng văn bản và làm thành 02 bản (mỗi bên giữ 01 bản), trừ trường hợp giao kết bằng lời nói đối với hợp đồng dưới 01 tháng. Hợp đồng giao kết thông qua phương tiện điện tử dưới hình thức thông điệp dữ liệu có giá trị như hợp đồng lao động bằng văn bản.",
+    "source_reference": "Điều 14"
+  },
+  {
+    "question": "Những hành vi nào người sử dụng lao động tuyệt đối không được làm khi giao kết và thực hiện hợp đồng lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người sử dụng lao động không được làm các hành vi sau: 1. Giữ bản chính giấy tờ tùy thân, văn bằng, chứng chỉ của người lao động. 2. Yêu cầu người lao động phải thực hiện biện pháp bảo đảm bằng tiền hoặc tài sản khác cho việc thực hiện hợp đồng. 3. Buộc người lao động thực hiện hợp đồng lao động để trả nợ cho mình.",
+    "source_reference": "Điều 17"
+  },
+  {
+    "question": "Người lao động chưa đủ 18 tuổi cần điều kiện gì để được ký kết hợp đồng lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Đối với người lao động từ đủ 15 tuổi đến chưa đủ 18 tuổi, khi giao kết hợp đồng lao động phải có sự đồng ý bằng văn bản của người đại diện theo pháp luật của người đó. Đối với người chưa đủ 15 tuổi, hợp đồng phải do người chưa đủ 15 tuổi và người đại diện theo pháp luật của họ cùng giao kết.",
+    "source_reference": "Điều 18, Khoản 4"
+  },
+  {
+    "question": "Người lao động có được ký kết nhiều hợp đồng lao động với nhiều công ty khác nhau không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động có thể giao kết nhiều hợp đồng lao động với nhiều người sử dụng lao động nhưng phải bảo đảm thực hiện đầy đủ các nội dung đã giao kết.",
+    "source_reference": "Điều 19, Khoản 1"
+  },
+  {
+    "question": "Có mấy loại hợp đồng lao động theo Bộ luật Lao động 2019?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Có 02 loại hợp đồng lao động: a) Hợp đồng lao động không xác định thời hạn (hai bên không xác định thời hạn, thời điểm chấm dứt hiệu lực); b) Hợp đồng lao động xác định thời hạn (hai bên xác định thời hạn, thời điểm chấm dứt trong thời gian không quá 36 tháng).",
+    "source_reference": "Điều 20, Khoản 1"
+  },
+  {
+    "question": "Khi hợp đồng lao động xác định thời hạn hết hạn mà người lao động vẫn làm việc thì xử lý như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Trong vòng 30 ngày kể từ ngày hết hạn, hai bên phải ký hợp đồng mới; nếu không ký, hợp đồng cũ trở thành hợp đồng không xác định thời hạn. Nếu ký hợp đồng mới là xác định thời hạn thì chỉ được ký thêm 01 lần, sau đó nếu tiếp tục làm việc thì phải ký hợp đồng không xác định thời hạn (trừ một số trường hợp ngoại lệ quy định tại luật).",
+    "source_reference": "Điều 20, Khoản 2"
+  },
+  {
+    "question": "Nội dung chủ yếu của một hợp đồng lao động phải bao gồm những gì?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Hợp đồng lao động phải gồm các nội dung chủ yếu: Thông tin người sử dụng và người lao động; Công việc và địa điểm làm việc; Thời hạn hợp đồng; Mức lương, phụ cấp, hình thức và kỳ hạn trả lương; Chế độ nâng lương; Thời giờ làm việc, nghỉ ngơi; Trang bị bảo hộ lao động; Bảo hiểm xã hội, y tế, thất nghiệp; Đào tạo bồi dưỡng nâng cao trình độ.",
+    "source_reference": "Điều 21, Khoản 1"
+  },
+  {
+    "question": "Phụ lục hợp đồng lao động có giá trị như thế nào và có được dùng để thay đổi thời hạn hợp đồng không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Phụ lục hợp đồng lao động là bộ phận của hợp đồng lao động và có hiệu lực như hợp đồng lao động. Phụ lục quy định chi tiết, sửa đổi, bổ sung một số điều nhưng không được sửa đổi thời hạn của hợp đồng lao động.",
+    "source_reference": "Điều 22"
+  },
+  {
+    "question": "Thời gian thử việc tối đa cho vị trí quản lý doanh nghiệp và vị trí yêu cầu trình độ cao đẳng trở lên là bao nhiêu ngày?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Thời gian thử việc tối đa đối với công việc của người quản lý doanh nghiệp theo Luật Doanh nghiệp là không quá 180 ngày. Đối với công việc cần trình độ chuyên môn, kỹ thuật từ cao đẳng trở lên là không quá 60 ngày.",
+    "source_reference": "Điều 25, Khoản 1 và Khoản 2"
+  },
+  {
+    "question": "Khi tạm thời chuyển người lao động sang làm công việc khác so với hợp đồng, người sử dụng lao động cần đảm bảo điều kiện gì về thời hạn và tiền lương?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employer",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Không được quá 60 ngày làm việc cộng dồn trong 1 năm trừ khi người lao động đồng ý bằng văn bản. Phải báo trước ít nhất 03 ngày làm việc. Lương theo công việc mới phải ít nhất bằng 85% lương cũ và không thấp hơn lương tối thiểu. Nếu lương mới thấp hơn lương cũ thì được giữ nguyên lương cũ trong 30 ngày làm việc.",
+    "source_reference": "Điều 29"
+  },
+  {
+    "question": "Kể ra các trường hợp người lao động được tạm hoãn thực hiện hợp đồng lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Các trường hợp tạm hoãn bao gồm: Thực hiện nghĩa vụ quân sự, dân quân tự vệ; Bị tạm giữ, tạm giam; Chấp hành biện pháp đưa vào trường giáo dưỡng, cơ sở cai nghiện/giáo dục bắt buộc; Lao động nữ mang thai; Được bổ nhiệm làm người quản lý doanh nghiệp của công ty TNHH MTV do Nhà nước nắm giữ 100% vốn; Được ủy quyền đại diện vốn nhà nước/doanh nghiệp; Trường hợp khác do thỏa thuận.",
+    "source_reference": "Điều 30, Khoản 1"
+  },
+  {
+    "question": "Sau khi hết thời hạn tạm hoãn hợp đồng lao động, người lao động phải có mặt tại nơi làm việc trong thời hạn bao nhiêu ngày?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Trong thời hạn 15 ngày kể từ ngày hết thời hạn tạm hoãn thực hiện hợp đồng lao động, người lao động phải có mặt tại nơi làm việc và người sử dụng lao động phải nhận người lao động trở lại làm công việc theo hợp đồng đã giao kết nếu hợp đồng còn thời hạn.",
+    "source_reference": "Điều 31"
+  },
+  {
+    "question": "Khi muốn sửa đổi hoặc bổ sung nội dung hợp đồng lao động, các bên phải báo trước cho nhau ít nhất bao nhiêu ngày làm việc?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Trong quá trình thực hiện hợp đồng lao động, nếu bên nào có yêu cầu sửa đổi, bổ sung nội dung hợp đồng lao động thì phải báo cho bên kia biết trước ít nhất 03 ngày làm việc về nội dung cần sửa đổi, bổ sung.",
+    "source_reference": "Điều 33, Khoản 1"
+  },
+  {
+    "question": "Hãy liệt kê các trường hợp người lao động có quyền đơn phương chấm dứt hợp đồng lao động mà không cần báo trước?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Các trường hợp không cần báo trước bao gồm: Không được bố trí đúng công việc, địa điểm hoặc điều kiện đã thỏa thuận; Không được trả đủ hoặc đúng hạn lương; Bị ngược đãi, đánh đập, nhục mạ; Bị cưỡng bức lao động hoặc quấy rối tình dục tại nơi làm việc; Lao động nữ mang thai phải nghỉ việc; Đủ tuổi nghỉ hưu; Người sử dụng lao động cung cấp thông tin không trung thực.",
+    "source_reference": "Điều 35, Khoản 2"
+  },
+  {
+    "question": "Người lao động đơn phương chấm dứt hợp đồng lao động trái pháp luật thì phải gánh chịu những nghĩa vụ bồi thường gì?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động đơn phương chấm dứt hợp đồng trái pháp luật sẽ: Không được trợ cấp thôi việc; Phải bồi thường cho người sử dụng lao động nửa tháng tiền lương theo hợp đồng và khoản tiền tương ứng với lương trong những ngày không báo trước (nếu vi phạm thời hạn báo trước); Phải hoàn trả chi phí đào tạo.",
+    "source_reference": "Điều 40"
+  },
+  {
+    "question": "Để được nhận trợ cấp thôi việc, người lao động cần đáp ứng điều kiện thời gian làm việc thường xuyên là bao nhiêu lâu và mức trợ cấp tính như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người sử dụng lao động có trách nhiệm trả trợ cấp thôi việc cho người lao động đã làm việc thường xuyên cho mình từ đủ 12 tháng trở lên khi hợp đồng chấm dứt theo quy định. Mỗi năm làm việc được trợ cấp một nửa tháng tiền lương, trừ trường hợp đủ điều kiện hưởng lương hưu hoặc tự ý bỏ việc từ 05 ngày liên tục trở lên.",
+    "source_reference": "Điều 46, Khoản 1"
+  },
+  {
+    "question": "Thời hạn thanh toán đầy đủ các khoản tiền liên quan đến quyền lợi của mỗi bên sau khi chấm dứt hợp đồng lao động là bao nhiêu ngày?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Trong thời hạn 14 ngày làm việc kể từ ngày chấm dứt hợp đồng lao động, hai bên có trách nhiệm thanh toán đầy đủ các khoản tiền liên quan. Trường hợp đặc biệt (như thiên tai, dịch bệnh, người sử dụng lao động chấm dứt hoạt động, thay đổi cơ cấu...) có thể kéo dài nhưng không được quá 30 ngày.",
+    "source_reference": "Điều 48, Khoản 1"
+  },
+  {
+    "question": "Hợp đồng lao động vô hiệu toàn bộ trong những trường hợp cụ thể nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Hợp đồng lao động vô hiệu toàn bộ khi: a) Toàn bộ nội dung của hợp đồng lao động vi phạm pháp luật; b) Người giao kết không đúng thẩm quyền hoặc vi phạm nguyên tắc tự nguyện, bình đẳng, thiện chí, hợp tác, trung thực; c) Công việc đã giao kết trong hợp đồng lao động là công việc mà pháp luật cấm.",
+    "source_reference": "Điều 49, Khoản 1"
+  },
+  {
+    "question": "Cơ quan nào có thẩm quyền tuyên bố hợp đồng lao động vô hiệu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Tòa án nhân dân có quyền tuyên bố hợp đồng lao động vô hiệu.",
+    "source_reference": "Điều 50"
+  },
+    {
+    "question": "Đối thoại tại nơi làm việc được thực hiện định kỳ bao lâu một lần và trong trường hợp nào thì phải tổ chức đối thoại khi có yêu cầu?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người sử dụng lao động phải tổ chức đối thoại tại nơi làm việc định kỳ ít nhất 01 năm một lần. Ngoài ra, đối thoại phải được tổ chức khi có yêu cầu của một hoặc các bên hoặc khi có các sự kiện như: người sử dụng lao động cho thôi việc nhiều người lao động do thay đổi cơ cấu; khi xây dựng thang lương, bảng lương, định mức lao động; hoặc khi tạm đình chỉ công việc của người lao động.",
+    "source_reference": "Điều 63, Khoản 1 và Khoản 2"
+  },
+  {
+    "question": "Thỏa ước lao động tập thể là gì và gồm những loại nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Thỏa ước lao động tập thể là thỏa thuận đạt được thông qua thương lượng tập thể và được các bên ký kết bằng văn bản. Thỏa ước lao động tập thể bao gồm thỏa ước lao động tập thể doanh nghiệp, thỏa ước lao động tập thể ngành, thỏa ước lao động tập thể nhiều doanh nghiệp và các thỏa ước lao động tập thể khác.",
+    "source_reference": "Điều 75"
+  },
+  {
+    "question": "Nguyên tắc xây dựng mức lương tối thiểu được quy định dựa trên những yếu tố nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Mức lương tối thiểu được xác định theo vùng, được điều chỉnh dựa trên nhu cầu sống tối thiểu của người lao động và gia đình họ; tương quan giữa mức lương tối thiểu và mức lương trên thị trường; chỉ số giá tiêu dùng, tốc độ tăng trưởng kinh tế; quan hệ cung cầu lao động; việc làm và thất nghiệp; năng suất lao động; khả năng chi trả của doanh nghiệp.",
+    "source_reference": "Điều 91, Khoản 3"
+  },
+  {
+    "question": "Người sử dụng lao động có được quyền phạt tiền hoặc cúp lương thay cho việc xử lý kỷ luật lao động không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người sử dụng lao động không được dùng hình thức phạt tiền, cắt lương thay cho việc xử lý kỷ luật lao động. Đây là một trong những hành vi bị nghiêm cấm khi xử lý kỷ luật lao động.",
+    "source_reference": "Điều 127, Khoản 2"
+  },
+  {
+    "question": "Khi trả lương, người sử dụng lao động có nghĩa vụ gì về việc thông báo bảng kê lương cho người lao động?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Mỗi lần trả lương, người sử dụng lao động phải thông báo bảng kê thanh toán tiền lương cho người lao động, trong đó ghi rõ tiền lương, tiền lương làm thêm giờ, tiền lương làm việc vào ban đêm, nội dung và số tiền bị khấu trừ (nếu có).",
+    "source_reference": "Điều 95, Khoản 3"
+  },
+  {
+    "question": "Người lao động làm thêm giờ vào ngày nghỉ hằng tuần được trả lương ít nhất bằng bao nhiêu phần trăm lương ngày thường?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động làm thêm giờ vào ngày nghỉ hằng tuần được trả lương tính theo đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm ít nhất bằng 200%.",
+    "source_reference": "Điều 98, Khoản 1, Điểm b"
+  },
+  {
+    "question": "Tiền lương làm thêm giờ vào ngày nghỉ lễ, tết, ngày nghỉ có hưởng lương được tính tối thiểu là bao nhiêu phần trăm?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Vào ngày nghỉ lễ, tết, ngày nghỉ có hưởng lương, người lao động làm thêm giờ được trả lương ít nhất bằng 300% chưa kể tiền lương ngày lễ, tết, ngày nghỉ có hưởng lương đối với người lao động hưởng lương ngày.",
+    "source_reference": "Điều 98, Khoản 1, Điểm c"
+  },
+  {
+    "question": "Người lao động làm việc vào ban đêm thì được trả thêm tối thiểu bao nhiêu phần trăm tiền lương?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động làm việc vào ban đêm thì được trả thêm ít nhất bằng 30% tiền lương tính theo đơn giá tiền lương hoặc tiền lương thực trả theo công việc của ngày làm việc bình thường.",
+    "source_reference": "Điều 98, Khoản 2"
+  },
+  {
+    "question": "Trong trường hợp ngừng việc do lỗi của người sử dụng lao động thì người lao động được trả lương như thế nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Nếu phải ngừng việc do lỗi của người sử dụng lao động thì người lao động được trả đủ tiền lương theo hợp đồng lao động.",
+    "source_reference": "Điều 99, Khoản 1"
+  },
+  {
+    "question": "Thời giờ làm việc bình thường của người lao động không được quá bao nhiêu giờ trong một ngày và một tuần?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Thời giờ làm việc bình thường không quá 08 giờ trong 01 ngày và không quá 48 giờ trong 01 tuần. Nhà nước khuyến khích người sử dụng lao động thực hiện tuần làm việc 40 giờ đối với người lao động.",
+    "source_reference": "Điều 105, Khoản 1"
+  },
+  {
+    "question": "Người lao động làm việc trong ngày được nghỉ giữa giờ ít nhất bao nhiêu phút và trường hợp làm ca đêm thì được nghỉ bao nhiêu phút?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động làm việc trong ngày từ 06 giờ trở lên thì được nghỉ giữa giờ ít nhất 30 phút liên tục, trường hợp làm việc vào ban đêm thì được nghỉ giữa giờ ít nhất 45 phút liên tục. Trường hợp làm việc theo ca liên tục từ 06 giờ trở lên thì thời gian nghỉ giữa giờ được tính vào giờ làm việc.",
+    "source_reference": "Điều 109, Khoản 1"
+  },
+  {
+    "question": "Mỗi tuần người lao động được bảo đảm nghỉ hằng tuần ít nhất bao nhiêu giờ liên tục?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Mỗi tuần, người lao động được bảo đảm nghỉ ít nhất 24 giờ liên tục. Trong trường hợp đặc biệt do chu kỳ lao động không thể nghỉ hằng tuần thì người sử dụng lao động có trách nhiệm bảo đảm cho người lao động được nghỉ tính bình quân 01 tháng ít nhất 04 ngày nghỉ.",
+    "source_reference": "Điều 111, Khoản 1"
+  },
+  {
+    "question": "Người lao động làm việc đủ 12 tháng cho một người sử dụng lao động thì được nghỉ hằng năm hưởng nguyên lương bao nhiêu ngày (đối với điều kiện làm việc bình thường)?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Người lao động làm việc đủ 12 tháng cho một người sử dụng lao động thì được nghỉ hằng năm, hưởng nguyên lương theo hợp đồng lao động là 12 ngày làm việc đối với người làm công việc trong điều kiện bình thường.",
+    "source_reference": "Điều 113, Khoản 1, Điểm a"
+  },
+  {
+    "question": "Cứ sau bao nhiêu năm làm việc cho một người sử dụng lao động thì số ngày nghỉ hằng năm của người lao động được tăng thêm 01 ngày?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["vector_search"],
+    "category": "A",
+    "ground_truth": "Cứ đủ 05 năm làm việc cho một người sử dụng lao động thì số ngày nghỉ hằng năm của người lao động theo quy định tại khoản 1 Điều 113 được tăng thêm tương ứng 01 ngày.",
+    "source_reference": "Điều 114"
+  }
+]

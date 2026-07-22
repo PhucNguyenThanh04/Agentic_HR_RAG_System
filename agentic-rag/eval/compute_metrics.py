@@ -5,16 +5,15 @@ Tổng hợp metrics từ file results.jsonl do run_eval.py sinh ra.
 
 Giả định:
 - Mỗi dòng jsonl có các field: question, employee_id, user_role, expected_tool,
-  ground_truth, final_answer, finish_reason, is_done, total_steps, tools_called,
-  asked_user, retrieved_chunks, latency_ms, correct
-- Field `correct` đã được gán tay: true / false / null (null = chưa chấm)
-  Chấp nhận cả 1/0 hoặc "true"/"false" dạng string cho tiện khi sửa tay bằng text editor.
+  finish_reason, is_done, total_steps, tools_called và latency_ms.
 
-Không phụ thuộc RAGAS, không gọi Qdrant/Gemini. Chỉ đọc + tính toán.
+Script chỉ đọc file cục bộ, không gọi API, Qdrant, Gemini hoặc so sánh
+answer với ground_truth. File input không bị chỉnh sửa.
 
 Usage:
     python compute_metrics.py results.jsonl
     python compute_metrics.py results.jsonl --output metrics_summary.json
+    python compute_metrics.py results.jsonl --normalized-output results_normalized.jsonl
 """
 
 from __future__ import annotations
@@ -30,6 +29,7 @@ from typing import Any
 
 def load_results(path: Path) -> list[dict[str, Any]]:
     rows = []
+    decoder = json.JSONDecoder()
     with path.open("r", encoding="utf-8") as f:
         for line_no, line in enumerate(f, start=1):
             line = line.strip()
@@ -37,27 +37,27 @@ def load_results(path: Path) -> list[dict[str, Any]]:
                 continue
             try:
                 rows.append(json.loads(line))
-            except json.JSONDecodeError as e:
-                print(f"[WARN] Bỏ qua dòng {line_no} (JSON lỗi): {e}", file=sys.stderr)
+            except json.JSONDecodeError:
+                # Nếu lỗi, có thể do dòng chứa nhiều JSON objects dính nhau
+                # Thử giải mã tuần tự bằng raw_decode
+                pos = 0
+                objs = []
+                while pos < len(line):
+                    # Bỏ qua khoảng trắng
+                    while pos < len(line) and line[pos].isspace():
+                        pos += 1
+                    if pos >= len(line):
+                        break
+                    try:
+                        obj, idx = decoder.raw_decode(line, pos)
+                        objs.append(obj)
+                        pos = idx
+                    except json.JSONDecodeError as e:
+                        print(f"[WARN] Dòng {line_no} chứa JSON lỗi tại vị trí {pos}: {e}", file=sys.stderr)
+                        break
+                if objs:
+                    rows.extend(objs)
     return rows
-
-
-def normalize_correct(value: Any) -> bool | None:
-    """Chuẩn hoá field `correct` về True / False / None (chưa chấm)."""
-    if value is None:
-        return None
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, (int, float)):
-        return bool(value)
-    if isinstance(value, str):
-        v = value.strip().lower()
-        if v in ("true", "1", "yes", "y", "đúng", "dung"):
-            return True
-        if v in ("false", "0", "no", "n", "sai"):
-            return False
-    print(f"[WARN] Giá trị 'correct' không nhận dạng được: {value!r} -> coi như chưa chấm", file=sys.stderr)
-    return None
 
 
 def percentile(values: list[float], pct: float) -> float:
@@ -101,9 +101,21 @@ def compute_tool_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
         if expected is None:
             continue
         total += 1
-        if called and called[0] == expected:
+
+        # Chuẩn hoá expected thành danh sách các tool mong đợi
+        if isinstance(expected, list):
+            expected_list = expected
+        elif isinstance(expected, str):
+            expected_list = [expected]
+        else:
+            expected_list = []
+
+        if not expected_list:
+            continue
+
+        if called and called[0] in expected_list:
             first_match += 1
-        if expected in called:
+        if any(t in called for t in expected_list):
             any_match += 1
     if total == 0:
         return {"total": 0, "first_call_accuracy": None, "any_call_accuracy": None}
@@ -114,40 +126,32 @@ def compute_tool_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def compute_correctness(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    graded = []
-    ungraded = 0
-    for r in rows:
-        c = normalize_correct(r.get("correct"))
-        if c is None:
-            ungraded += 1
-        else:
-            graded.append(c)
-    if not graded:
-        return {"graded": 0, "ungraded": ungraded, "accuracy": None}
-    return {
-        "graded": len(graded),
-        "ungraded": ungraded,
-        "accuracy": round(sum(graded) / len(graded), 4),
-    }
-
-
 def compute_breakdown_by_tool(rows: list[dict[str, Any]]) -> dict[str, Any]:
     groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for r in rows:
-        key = r.get("expected_tool") or "unknown"
+        expected = r.get("expected_tool")
+        if isinstance(expected, list):
+            key = ", ".join(expected)
+        else:
+            key = expected or "unknown"
         groups[key].append(r)
 
     breakdown = {}
     for tool, group_rows in groups.items():
-        lat = [r["latency_ms"] for r in group_rows if isinstance(r.get("latency_ms"), (int, float))]
-        steps = [r["total_steps"] for r in group_rows if isinstance(r.get("total_steps"), (int, float))]
+        lat = [
+            r["latency_ms"]
+            for r in group_rows
+            if isinstance(r.get("latency_ms"), (int, float))
+        ]
+        steps = [
+            r["total_steps"]
+            for r in group_rows
+            if isinstance(r.get("total_steps"), (int, float))
+        ]
         tool_m = compute_tool_metrics(group_rows)
-        correctness_m = compute_correctness(group_rows)
         breakdown[tool] = {
             "count": len(group_rows),
             "tool_selection": tool_m,
-            "correctness": correctness_m,
             "avg_steps": round(statistics.mean(steps), 2) if steps else None,
             "latency_ms": latency_stats(lat),
         }
@@ -158,8 +162,16 @@ def compute_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     total = len(rows)
     ask_user_count = sum(1 for r in rows if r.get("finish_reason") == "ask_user")
     not_done = sum(1 for r in rows if not r.get("is_done", True))
-    all_latencies = [r["latency_ms"] for r in rows if isinstance(r.get("latency_ms"), (int, float))]
-    all_steps = [r["total_steps"] for r in rows if isinstance(r.get("total_steps"), (int, float))]
+    all_latencies = [
+        r["latency_ms"]
+        for r in rows
+        if isinstance(r.get("latency_ms"), (int, float))
+    ]
+    all_steps = [
+        r["total_steps"]
+        for r in rows
+        if isinstance(r.get("total_steps"), (int, float))
+    ]
 
     return {
         "total_samples": total,
@@ -168,7 +180,6 @@ def compute_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "avg_steps": round(statistics.mean(all_steps), 2) if all_steps else None,
         "latency_ms": latency_stats(all_latencies),
         "tool_selection": compute_tool_metrics(rows),
-        "correctness": compute_correctness(rows),
         "breakdown_by_expected_tool": compute_breakdown_by_tool(rows),
     }
 
@@ -186,27 +197,59 @@ def print_report(summary: dict[str, Any]) -> None:
     print("-- Tool selection (toàn bộ) --")
     print(summary["tool_selection"])
     print()
-    print("-- Correctness (toàn bộ, dựa trên field 'correct' đã gán tay) --")
-    c = summary["correctness"]
-    print(c)
-    if c["ungraded"] > 0:
-        print(f"[LƯU Ý] Còn {c['ungraded']} mẫu chưa được gán 'correct' -> chưa tính vào accuracy.")
-    print()
     print("-- Breakdown theo expected_tool --")
     for tool, m in summary["breakdown_by_expected_tool"].items():
         print(f"\n[{tool}] (n={m['count']})")
         print(f"  tool_selection : {m['tool_selection']}")
-        print(f"  correctness    : {m['correctness']}")
         print(f"  avg_steps      : {m['avg_steps']}")
         print(f"  latency_ms     : {m['latency_ms']}")
     print("=" * 60)
 
 
+def load_dataset_expected_tools() -> dict[str, Any]:
+    """Đọc expected_tool từ tất cả dataset JSON cục bộ."""
+    dataset_dir = Path(__file__).resolve().parent / "dataset"
+    mapping: dict[str, Any] = {}
+    for path in sorted(dataset_dir.glob("*.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"[WARN] Không thể đọc dataset {path}: {exc}", file=sys.stderr)
+            continue
+        if not isinstance(data, list):
+            continue
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            question = str(item.get("question") or "").strip()
+            expected_tool = item.get("expected_tool")
+            if question and expected_tool:
+                mapping[question] = expected_tool
+    return mapping
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Tổng hợp metrics từ results.jsonl")
-    parser.add_argument("results_path", type=Path, help="Đường dẫn tới file results.jsonl")
-    parser.add_argument("--output", type=Path, default=None,
-                         help="Nếu set, ghi summary dạng JSON ra file này")
+    parser.add_argument(
+        "results_path",
+        type=Path,
+        help="Đường dẫn tới file results.jsonl",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Nếu set, ghi summary dạng JSON ra file này",
+    )
+    parser.add_argument(
+        "--normalized-output",
+        type=Path,
+        default=None,
+        help=(
+            "Nếu set, ghi các record đã bổ sung total_steps, latency_ms, "
+            "expected_tool và is_done ra một file JSONL mới"
+        ),
+    )
     args = parser.parse_args()
 
     if not args.results_path.exists():
@@ -218,11 +261,63 @@ def main() -> None:
         print("[ERROR] File rỗng hoặc không parse được dòng nào.", file=sys.stderr)
         sys.exit(1)
 
+    # Tự động tính toán/bổ sung các trường còn thiếu từ dataset gốc
+    expected_tools_map = load_dataset_expected_tools()
+    for r in rows:
+        records = r.get("log_finish_records") or []
+
+        # Lấy total_steps từ log FINISH cuối cùng nếu record chưa có.
+        if r.get("total_steps") is None:
+            total_steps = next(
+                (
+                    rec.get("total_steps")
+                    for rec in reversed(records)
+                    if isinstance(rec.get("total_steps"), (int, float))
+                ),
+                None,
+            )
+            r["total_steps"] = total_steps
+
+        # Tính latency_ms từ log_finish_records
+        if r.get("latency_ms") is None:
+            total_sec = sum(
+                rec.get("elapsed_seconds", 0.0)
+                for rec in records
+                if isinstance(rec.get("elapsed_seconds"), (int, float))
+            )
+            r["latency_ms"] = total_sec * 1000.0 if total_sec > 0 else None
+
+        # Lấy expected_tool từ dataset gốc
+        if r.get("expected_tool") is None and "question" in r:
+            q = r["question"].strip()
+            if q in expected_tools_map:
+                r["expected_tool"] = expected_tools_map[q]
+        expected_tool = r.get("expected_tool")
+        if isinstance(expected_tool, str):
+            r["expected_tool"] = [expected_tool]
+        elif expected_tool is None:
+            r["expected_tool"] = []
+
+        # Gán is_done nếu thiếu
+        if "is_done" not in r:
+            r["is_done"] = "error" not in r
+
     summary = compute_summary(rows)
     print_report(summary)
 
+    if args.normalized_output:
+        args.normalized_output.parent.mkdir(parents=True, exist_ok=True)
+        with args.normalized_output.open("w", encoding="utf-8") as output_file:
+            for row in rows:
+                output_file.write(json.dumps(row, ensure_ascii=False) + "\n")
+        print(f"\nĐã ghi records chuẩn hóa ra: {args.normalized_output}")
+
     if args.output:
-        args.output.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(
+            json.dumps(summary, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
         print(f"\nĐã ghi summary JSON ra: {args.output}")
 
 

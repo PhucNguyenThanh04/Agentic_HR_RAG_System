@@ -43,26 +43,49 @@ class ChatService:
             pending_store=pending_store,
         )
 
-    async def chat(self, request: ChatRequest) -> ChatResponse:
-        registry = self._build_registry(request)
+    async def chat(self, request: ChatRequest, *, access_token: str) -> ChatResponse:
+        await self._validate_actor_context(request, access_token)
+        registry = self._build_registry(request, access_token)
         state = await self.supervisor.run(request, registry)
         return self._to_chat_response(state)
 
     async def chat_stream(
         self,
         request: ChatRequest,
+        *,
+        access_token: str,
     ) -> AsyncGenerator[str, None]:
-        registry = self._build_registry(request)
-        async for event, payload in self.supervisor.stream(request, registry):
-            if event == "_final_state":
-                state = payload["state"]
-                response = self._to_chat_response(state)
-                yield _format_sse("final", response.model_dump(mode="json"))
-                continue
+        await self._validate_actor_context(request, access_token)
+        registry = self._build_registry(request, access_token)
 
-            yield _format_sse(event, payload)
+        async def event_stream() -> AsyncGenerator[str, None]:
+            async for event, payload in self.supervisor.stream(request, registry):
+                if event == "_final_state":
+                    state = payload["state"]
+                    response = self._to_chat_response(state)
+                    yield _format_sse("final", response.model_dump(mode="json"))
+                    continue
 
-    def _build_registry(self, request: ChatRequest) -> ToolRegistry:
+                yield _format_sse(event, payload)
+
+        return event_stream()
+
+    async def _validate_actor_context(
+        self,
+        request: ChatRequest,
+        access_token: str,
+    ) -> None:
+        await self.api_service_client.validate_actor_context(
+            access_token=access_token,
+            expected_employee_id=request.employee_id,
+            expected_role=request.user_role,
+        )
+
+    def _build_registry(
+        self,
+        request: ChatRequest,
+        access_token: str,
+    ) -> ToolRegistry:
         registry = ToolRegistry()
         registry.register(
             VectorSearchTool(
@@ -76,6 +99,7 @@ class ChatService:
                 api_service_client=self.api_service_client,
                 employee_id=request.employee_id,
                 user_role=request.user_role,
+                access_token=access_token,
             )
         )
         registry.register(
@@ -83,6 +107,7 @@ class ChatService:
                 api_service_client=self.api_service_client,
                 employee_id=request.employee_id,
                 user_role=request.user_role,
+                access_token=access_token,
             )
         )
         registry.register(
@@ -90,6 +115,7 @@ class ChatService:
                 api_service_client=self.api_service_client,
                 employee_id=request.employee_id,
                 user_role=request.user_role,
+                access_token=access_token,
             )
         )
         registry.register(AskUserTool())

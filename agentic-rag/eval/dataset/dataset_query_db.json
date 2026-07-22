@@ -1,0 +1,129 @@
+[
+      {
+    "question": "Họ tên và mã nhân viên của tôi là gì?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["employee_query"],
+    "category": "employee_identity",
+    "ground_truth": "Phải gọi employee_query không kèm tham số và trả lời đúng full_name, employee_code từ kết quả tool.",
+    "source_reference": "employee_query"
+  },
+  {
+    "question": "Số điện thoại đang lưu trong hồ sơ nhân viên của tôi là số nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["employee_query"],
+    "category": "employee_contact",
+    "ground_truth": "Phải gọi employee_query và nêu phone đúng theo kết quả; nếu phone là null thì nói hồ sơ chưa có số điện thoại.",
+    "source_reference": "employee_query"
+  },
+  {
+    "question": "Tôi đang thuộc phòng ban và vị trí nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["employee_query"],
+    "category": "employee_organization",
+    "ground_truth": "Phải gọi employee_query và chỉ nêu department_id, position_id mà tool trả về; không tự suy diễn tên phòng ban hay chức danh.",
+    "source_reference": "employee_query"
+  },
+  {
+    "question": "Quản lý trực tiếp của tôi có mã nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["employee_query"],
+    "category": "employee_manager",
+    "ground_truth": "Phải gọi employee_query và trả lời manager_id; nếu manager_id là null thì nói chưa có quản lý trực tiếp trong hồ sơ.",
+    "source_reference": "employee_query"
+  },
+  {
+    "question": "Trạng thái làm việc hiện tại của tôi là gì, và hồ sơ có ngày nghỉ việc chưa?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["employee_query"],
+    "category": "employee_status",
+    "ground_truth": "Phải gọi employee_query và trả lời status, resignation_date; không tự suy diễn khi resignation_date là null.",
+    "source_reference": "employee_query"
+  },
+  {
+    "question": "Hôm nay tôi làm ca nào, bắt đầu và kết thúc lúc mấy giờ?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["shift_query"],
+    "category": "shift_current",
+    "ground_truth": "Phải gọi shift_query với input rỗng và nêu shift name, start_time, end_time đúng theo tool.",
+    "source_reference": "shift_query"
+  },
+  {
+    "question": "Ngày 2026-07-01 tôi được xếp ca gì?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["shift_query"],
+    "category": "shift_specific_date",
+    "ground_truth": "Phải gọi shift_query với as_of=2026-07-01 và nêu ca được API trả về; nếu empty thì nói không tìm thấy ca trong ngày đó.",
+    "source_reference": "shift_query"
+  },
+
+  {
+    "question": "Ca làm hiện tại của tôi có phải ca qua đêm không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["shift_query"],
+    "category": "shift_overnight",
+    "ground_truth": "Phải gọi shift_query và kết luận dựa trên is_overnight, kèm start_time và end_time nếu hữu ích.",
+    "source_reference": "shift_query"
+  },
+  {
+    "question": "Hôm nay tôi đã check-in và check-out chưa?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["attendance_query"],
+    "category": "attendance_today",
+    "ground_truth": "Phải gọi attendance_query với work_date_from và work_date_to bằng ngày hiện tại, rồi nêu check_in_time/check_out_time.",
+    "source_reference": "attendance_query"
+  },
+  {
+    "question": "Tháng này tôi có những ngày nào đi trễ?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["attendance_query"],
+    "category": "attendance_late",
+    "ground_truth": "Phải gọi attendance_query cho tháng hiện tại với status=late và liệt kê work_date, late_minutes, check_in_time.",
+    "source_reference": "attendance_query"
+  },
+  {
+    "question": "Trong tháng này tôi có hôm nào về sớm không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["attendance_query"],
+    "category": "attendance_early_leave",
+    "ground_truth": "Phải gọi attendance_query cho tháng hiện tại với status=early_leave và nêu work_date, early_leave_minutes, check_out_time theo tool.",
+    "source_reference": "attendance_query"
+  },
+  {
+    "question": "Từ đầu năm 2026 đến nay tôi có ngày nào vắng mặt?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["attendance_query"],
+    "category": "attendance_absent",
+    "ground_truth": "Phải gọi attendance_query từ 2026-01-01 đến ngày hiện tại với status=absent và nêu các work_date theo tool.",
+    "source_reference": "attendance_query"
+  },
+  {
+    "question": "Tháng này tôi quên check-out vào những ngày nào?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["attendance_query"],
+    "category": "attendance_missing_check_out",
+    "ground_truth": "Phải gọi attendance_query cho tháng hiện tại với status=missing_check_out và nêu các work_date, check_in_time theo tool.",
+    "source_reference": "attendance_query"
+  },
+  {
+    "question": "Dựa vào ca làm và chấm công hôm nay, tôi có đi trễ hoặc về sớm không?",
+    "employee_id": "49fe804f-061c-4dca-80c6-9d981a86a9bd",
+    "user_role": "employee",
+    "expected_tool": ["shift_query", "attendance_query"],
+    "category": "multi_shift_attendance",
+    "ground_truth": "Phải gọi shift_query và attendance_query cho hôm nay, sau đó kết luận chỉ từ ca, status, late_minutes, early_leave_minutes và check-in/out mà tools trả về.",
+    "source_reference": "shift_query, attendance_query"
+  }
+]

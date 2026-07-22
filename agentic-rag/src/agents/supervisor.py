@@ -78,6 +78,7 @@ class Supervisor:
         system_prompt = PromptBuilder.build_system_prompt(
             tool_descriptions=registry.build_tools_prompt(),
             current_date=date.today().isoformat(),
+            user_role=request.user_role,
         )
 
         log_agent_start(
@@ -257,6 +258,7 @@ class Supervisor:
         system_prompt = PromptBuilder.build_stream_system_prompt(
             tool_descriptions=registry.build_tools_prompt(),
             current_date=date.today().isoformat(),
+            user_role=request.user_role,
         )
 
         log_agent_start(

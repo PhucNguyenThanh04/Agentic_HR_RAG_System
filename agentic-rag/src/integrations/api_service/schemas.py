@@ -12,9 +12,16 @@ from src.utils.enums import (
 
 
 class APIServerPaths:
+    AUTH_ME = "/api/v1/auth/me"
+    EMPLOYEE_ME = "/api/v1/employees/me"
     EMPLOYEE_BY_ID = "/api/v1/employees/{employee_id}"
     EMPLOYEE_CURRENT_SHIFT = "/api/v1/employees/{employee_id}/current-shift"
     ATTENDANCE_RECORDS = "/api/v1/attendance/records"
+
+
+class AuthenticatedUserRead(BaseModel):
+    user_id: uuid.UUID
+    role_name: str
 
 
 class EmployeeRead(AppTimezoneModel):

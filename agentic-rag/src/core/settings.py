@@ -1,6 +1,8 @@
 from pathlib import Path
 from functools import lru_cache
-from pydantic import Field
+from typing import Literal
+
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -63,6 +65,12 @@ class Settings(BaseSettings):
     retrieval_top_k: int
     rerank_top_n: int
     retrieval_score_threshold: float
+    retrieval_query_strategy: Literal["dual_parallel", "fallback"] = "dual_parallel"
+    retrieval_rewrite_fallback_score: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+    )
 
     # API server
     api_host: str
@@ -79,6 +87,27 @@ class Settings(BaseSettings):
     @property
     def default_qdrant_collection(self) -> str:
         return self.qdrant_collection_policy
+
+    @model_validator(mode="after")
+    def validate_retrieval_strategy(self) -> "Settings":
+        if (
+            self.retrieval_query_strategy == "fallback"
+            and self.retrieval_rewrite_fallback_score is None
+        ):
+            raise ValueError(
+                "RETRIEVAL_REWRITE_FALLBACK_SCORE is required when "
+                "RETRIEVAL_QUERY_STRATEGY=fallback"
+            )
+        if (
+            self.retrieval_rewrite_fallback_score is not None
+            and self.retrieval_rewrite_fallback_score
+            < self.retrieval_score_threshold
+        ):
+            raise ValueError(
+                "RETRIEVAL_REWRITE_FALLBACK_SCORE must be greater than or "
+                "equal to RETRIEVAL_SCORE_THRESHOLD"
+            )
+        return self
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",

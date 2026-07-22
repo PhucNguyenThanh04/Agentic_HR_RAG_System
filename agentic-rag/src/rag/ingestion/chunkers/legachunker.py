@@ -12,16 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class LegalStructureAwareChunker(BaseChunker):
-    """
-    Chunker nhận biết cấu trúc văn bản pháp lý Việt Nam.
-
-    Hierarchy: Section (Điều) → Khoản → Điểm → recursive fallback.
-
-    Assumption: mỗi Document đầu vào tương đương một Điều/Section đã
-    được tách sẵn bởi loader. Nếu loader truyền vào cả một Chương,
-    regex Khoản có thể không match đúng.
-    """
-
     # FIX: Tách title và body rõ ràng, giới hạn \d{1,2} tránh match số năm/thứ tự khác.
     CLAUSE_PATTERN = re.compile(
         r"(?m)^(?P<number>\d{1,2})\.\s+(?P<title>[^\n]+)\n(?P<body>.*?)(?=^\d{1,2}\.\s|\Z)",

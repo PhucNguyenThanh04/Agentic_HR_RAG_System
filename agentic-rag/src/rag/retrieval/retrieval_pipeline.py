@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import time
+from typing import Literal
 from fastapi import Depends
 
 from src.core.settings import get_settings
@@ -18,6 +20,13 @@ settings = get_settings()
 SCORE_SPREAD_THRESHOLD = 0.3
 TOP_SCORE_WINDOW = 0.1
 
+RetrievalStatus = Literal[
+    "success",
+    "no_candidates",
+    "below_quality_threshold",
+    "context_budget_exhausted",
+]
+
 
 @dataclass
 class RetrievalPipelineResult:
@@ -26,6 +35,12 @@ class RetrievalPipelineResult:
     token_count: int
     low_confidence: bool
     used_context: bool
+    status: RetrievalStatus = "success"
+    candidate_count: int = 0
+    qualified_count: int = 0
+    selected_chunk_count: int = 0
+    best_score: float | None = None
+    latency_ms: float = 0.0
 
 
 class RetrievalPipeline:
@@ -48,22 +63,39 @@ class RetrievalPipeline:
         rerank_top_n: int | None = None,
         max_context_tokens: int = 3000,
     ) -> RetrievalPipelineResult:
+        started_at = time.perf_counter()
         retrieved_results = await self.hybrid_retriever.retrieve(
             query=query,
             collection_name=collection_name,
             top_k=top_k,
             allowed_role=allowed_role,
         )
+        candidate_count = len(retrieved_results)
+        if not retrieved_results:
+            return self._empty_result(
+                status="no_candidates",
+                candidate_count=0,
+                latency_ms=self._elapsed_ms(started_at),
+            )
 
         reranked_results = await self.reranker_service.rerank(
             query=query,
             results=retrieved_results,
             top_n=rerank_top_n,
         )
+        best_score = max(
+            (result.score for result in reranked_results),
+            default=None,
+        )
 
         qualified_results = self._filter_quality(reranked_results)
         if not qualified_results:
-            return self._empty_result()
+            return self._empty_result(
+                status="below_quality_threshold",
+                candidate_count=candidate_count,
+                best_score=best_score,
+                latency_ms=self._elapsed_ms(started_at),
+            )
 
         low_confidence = len(qualified_results) == 1
         context_result = self.context_builder.build(
@@ -72,7 +104,13 @@ class RetrievalPipeline:
         )
 
         if not context_result.chunks:
-            return self._empty_result()
+            return self._empty_result(
+                status="context_budget_exhausted",
+                candidate_count=candidate_count,
+                qualified_count=len(qualified_results),
+                best_score=best_score,
+                latency_ms=self._elapsed_ms(started_at),
+            )
 
         return RetrievalPipelineResult(
             chunks=context_result.chunks,
@@ -80,6 +118,12 @@ class RetrievalPipeline:
             token_count=context_result.token_count,
             low_confidence=low_confidence,
             used_context=True,
+            status="success",
+            candidate_count=candidate_count,
+            qualified_count=len(qualified_results),
+            selected_chunk_count=len(context_result.chunks),
+            best_score=best_score,
+            latency_ms=self._elapsed_ms(started_at),
         )
 
     def _filter_quality(
@@ -107,14 +151,31 @@ class RetrievalPipeline:
         ]
 
     @staticmethod
-    def _empty_result() -> RetrievalPipelineResult:
+    def _empty_result(
+        *,
+        status: RetrievalStatus,
+        candidate_count: int = 0,
+        qualified_count: int = 0,
+        best_score: float | None = None,
+        latency_ms: float = 0.0,
+    ) -> RetrievalPipelineResult:
         return RetrievalPipelineResult(
             chunks=[],
             citations=[],
             token_count=0,
             low_confidence=False,
             used_context=False,
+            status=status,
+            candidate_count=candidate_count,
+            qualified_count=qualified_count,
+            selected_chunk_count=0,
+            best_score=best_score,
+            latency_ms=latency_ms,
         )
+
+    @staticmethod
+    def _elapsed_ms(started_at: float) -> float:
+        return round((time.perf_counter() - started_at) * 1000, 3)
 
 
 

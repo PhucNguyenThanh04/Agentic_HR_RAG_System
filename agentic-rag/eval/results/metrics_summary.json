@@ -1,108 +1,99 @@
 {
-  "total_samples": 24,
-  "ask_user_rate": 0.0417,
+  "total_samples": 82,
+  "ask_user_rate": 0.0244,
   "not_done_rate": 0.0,
-  "avg_steps": 2.38,
+  "avg_steps": 2.08,
   "latency_ms": {
-    "mean": 7440.1,
-    "p50": 5741.0,
-    "p95": 19923.0,
-    "min": 3528.1,
-    "max": 22887.0
+    "mean": 17861.8,
+    "p50": 10136.0,
+    "p95": 54311.2,
+    "min": 5178.0,
+    "max": 94922.0
   },
   "tool_selection": {
-    "total": 24,
-    "first_call_accuracy": 0.9583,
-    "any_call_accuracy": 0.9583
-  },
-  "correctness": {
-    "graded": 24,
-    "ungraded": 0,
-    "accuracy": 0.875
+    "total": 82,
+    "first_call_accuracy": 0.9268,
+    "any_call_accuracy": 0.9268
   },
   "breakdown_by_expected_tool": {
     "vector_search": {
-      "count": 15,
+      "count": 68,
       "tool_selection": {
-        "total": 15,
-        "first_call_accuracy": 1.0,
-        "any_call_accuracy": 1.0
+        "total": 68,
+        "first_call_accuracy": 0.9265,
+        "any_call_accuracy": 0.9265
       },
-      "correctness": {
-        "graded": 15,
-        "ungraded": 0,
-        "accuracy": 0.8667
-      },
-      "avg_steps": 2.47,
+      "avg_steps": 2.1,
       "latency_ms": {
-        "mean": 8999.5,
-        "p50": 6749.5,
-        "p95": 21653.9,
-        "min": 4555.5,
-        "max": 22887.0
+        "mean": 16455.2,
+        "p50": 10192.0,
+        "p95": 49581.8,
+        "min": 6814.0,
+        "max": 60046.0
       }
     },
     "employee_query": {
+      "count": 5,
+      "tool_selection": {
+        "total": 5,
+        "first_call_accuracy": 0.8,
+        "any_call_accuracy": 0.8
+      },
+      "avg_steps": 1.8,
+      "latency_ms": {
+        "mean": 16751.6,
+        "p50": 10115.0,
+        "p95": 42149.6,
+        "min": 5178.0,
+        "max": 49685.0
+      }
+    },
+    "shift_query": {
       "count": 3,
       "tool_selection": {
         "total": 3,
         "first_call_accuracy": 1.0,
         "any_call_accuracy": 1.0
       },
-      "correctness": {
-        "graded": 3,
-        "ungraded": 0,
-        "accuracy": 1.0
-      },
       "avg_steps": 2,
       "latency_ms": {
-        "mean": 3801.7,
-        "p50": 3736.6,
-        "p95": 4099.9,
-        "min": 3528.1,
-        "max": 4140.3
-      }
-    },
-    "shift_query": {
-      "count": 4,
-      "tool_selection": {
-        "total": 4,
-        "first_call_accuracy": 0.75,
-        "any_call_accuracy": 0.75
-      },
-      "correctness": {
-        "graded": 4,
-        "ungraded": 0,
-        "accuracy": 0.75
-      },
-      "avg_steps": 2,
-      "latency_ms": {
-        "mean": 4654.6,
-        "p50": 4278.0,
-        "p95": 5936.9,
-        "min": 3851.0,
-        "max": 6211.4
+        "mean": 9758.0,
+        "p50": 9726.0,
+        "p95": 10000.5,
+        "min": 9517.0,
+        "max": 10031.0
       }
     },
     "attendance_query": {
-      "count": 2,
+      "count": 5,
       "tool_selection": {
-        "total": 2,
+        "total": 5,
         "first_call_accuracy": 1.0,
         "any_call_accuracy": 1.0
       },
-      "correctness": {
-        "graded": 2,
-        "ungraded": 0,
-        "accuracy": 1.0
+      "avg_steps": 2,
+      "latency_ms": {
+        "mean": 42065.8,
+        "p50": 14955.0,
+        "p95": 92588.8,
+        "min": 7475.0,
+        "max": 94922.0
+      }
+    },
+    "shift_query, attendance_query": {
+      "count": 1,
+      "tool_selection": {
+        "total": 1,
+        "first_call_accuracy": 1.0,
+        "any_call_accuracy": 1.0
       },
       "avg_steps": 3,
       "latency_ms": {
-        "mean": 6772.7,
-        "p50": 6772.7,
-        "p95": 8938.0,
-        "min": 4366.8,
-        "max": 9178.6
+        "mean": 15324.0,
+        "p50": 15324.0,
+        "p95": 15324.0,
+        "min": 15324.0,
+        "max": 15324.0
       }
     }
   }
