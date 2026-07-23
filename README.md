@@ -15,7 +15,8 @@ Một hệ thống HR chatbot theo kiến trúc multi-service: Core Backend xác
 
 ## Features
 
-- ReAct Agent tự chọn tool: `vector_search`, `api_query_db`, `ask_user`.
+- ReAct Agent tự chọn tool: `vector_search`, `employee_query`, `shift_query`,
+  `attendance_query`, `ask_user`.
 - RAG tiếng Việt với BGE-M3 dense+sparse, Qdrant hybrid search, RRF và reranking.
 - Multi-turn clarification bằng Redis Pending Store khi câu hỏi thiếu thông tin.
 - Core Backend xác thực JWT, truyền `employee_id` và `user_role` đã xác thực sang Agentic Service.
@@ -69,7 +70,9 @@ Một hệ thống HR chatbot theo kiến trúc multi-service: Core Backend xác
 | Tool | Input chính | Output | Dùng khi |
 |---|---|---|---|
 | `vector_search` | `{ "query": "..." }` | `ToolResult` gồm observation, citations, `used_context`, `low_confidence` | Tra cứu chính sách, nội quy, quy trình đã index trong Qdrant. |
-| `api query db` | `{role, employee_id}` | Tra cứu dữ liệu trong database|
+| `employee_query` | `employee_id` tùy chọn | Hồ sơ nhân viên theo scope đã được API kiểm tra | Tra cứu mã nhân viên, họ tên, trạng thái, phòng ban, chức vụ, quản lý hoặc thông tin liên hệ. |
+| `shift_query` | `employee_id`, `as_of` tùy chọn | Ca làm tại ngày cần tra cứu | Tra cứu giờ bắt đầu/kết thúc, ngưỡng đi trễ/về sớm hoặc số phút làm việc yêu cầu. |
+| `attendance_query` | Khoảng ngày, trạng thái và các bộ lọc tùy chọn | Danh sách bản ghi chấm công | Tra cứu check-in/check-out, đi trễ, về sớm, ngày công hoặc trạng thái chấm công. |
 | `ask_user` | `question`, `options`, `allow_free_text` | Signal `__ASK_USER__{...}` để lưu pending state | Câu hỏi thiếu mốc thời gian, loại phép, hoặc điều kiện cần làm rõ. |
 
 
@@ -89,18 +92,85 @@ Một hệ thống HR chatbot theo kiến trúc multi-service: Core Backend xác
 
 ## Evaluation
 
-Hệ thống được đánh giá hiệu năng dựa trên bộ tiêu chuẩn **RAGAS** (sử dụng Gemini-1.5-Flash làm Judge LLM) kết hợp cùng một số chỉ số tùy chỉnh dành riêng cho Agent (Custom Agent Metrics):
+Kết quả dưới đây được tổng hợp từ các artifact hiện có trong
+[`agentic-rag/eval/results`](./agentic-rag/eval/results). Bộ đánh giá gồm hai
+phần:
 
-### Bảng chỉ số đánh giá (Evaluation Metrics)
+- **Agent metrics**: chạy luồng `ChatService` thật, không mock, để đo khả năng
+  hoàn thành, chọn tool, số bước và latency trên 82 test case.
+- **RAGAS**: đánh giá các test case `vector_search` bằng Groq
+  `llama-3.3-70b-versatile` làm judge LLM và BGE-M3 làm embedding model.
 
-| Chỉ số (Metrics) | Điểm số | Ý nghĩa kỹ thuật |
-|---|---|---|
-| **Faithfulness** (Độ trung thực) | **0.89** | Đo lường mức độ câu trả lời được suy ra hoàn toàn từ Context được cung cấp (tránh hallucination). |
-| **Answer Relevancy** (Độ liên quan) | **0.70** | Đánh giá câu trả lời có trực tiếp giải quyết đúng trọng tâm câu hỏi của người dùng hay không. |
-| **Context Precision** (Độ chuẩn xác Context) | **0.95** | Đo lường xem các chunk thực sự liên quan có được Reranker đưa lên các vị trí đầu tiên hay không. |
-| **Context Recall** (Độ phủ Context) | **0.93** | Đánh giá tỷ lệ thông tin cần thiết trong tài liệu gốc được truy xuất thành công. |
-| **Tool Dispatch Accuracy** (Custom) | **92%** | Tỷ lệ Agent gọi chính xác công cụ nghiệp vụ (`vector_search` vs `api_query_database`). |
-| **Clarification Rate** (Custom) | **15%** | Tỷ lệ Agent kích hoạt `ask_user` thành công khi gặp các câu hỏi mơ hồ, thay vì đoán mò. |
+### Kết quả tổng quan
+
+| Chỉ số | Kết quả |
+|---|---:|
+| Tổng số test case | **82** |
+| Tỷ lệ hoàn thành (`is_done=true`) | **100.00%** |
+| Tỷ lệ kết thúc với `ask_user` | **2.44% (2/82)** |
+| Số bước trung bình | **2.08** |
+| First-call tool accuracy | **92.68% (76/82)** |
+| Any-call tool accuracy | **92.68% (76/82)** |
+
+`First-call tool accuracy` đo tỷ lệ tool đầu tiên khớp `expected_tool`.
+`Any-call tool accuracy` đo tỷ lệ tool mong đợi xuất hiện ở bất kỳ bước nào
+trong ReAct loop. Hai chỉ số bằng nhau trên lần chạy này.
+
+### Kết quả theo expected tool
+
+| Expected tool | Số mẫu | First-call accuracy | Any-call accuracy | Số bước TB | Latency TB |
+|---|---:|---:|---:|---:|---:|
+| `vector_search` | 68 | 92.65% | 92.65% | 2.10 | 16,455.2 ms |
+| `employee_query` | 5 | 80.00% | 80.00% | 1.80 | 16,751.6 ms |
+| `shift_query` | 3 | 100.00% | 100.00% | 2.00 | 9,758.0 ms |
+| `attendance_query` | 5 | 100.00% | 100.00% | 2.00 | 42,065.8 ms |
+| `shift_query` hoặc `attendance_query` | 1 | 100.00% | 100.00% | 3.00 | 15,324.0 ms |
+
+Với test case có nhiều `expected_tool`, metric hiện tại tính là đúng khi agent
+gọi một trong các tool được kỳ vọng; metric này không yêu cầu gọi đủ tất cả
+tool trong danh sách.
+
+### Latency
+
+| Chỉ số | Thời gian |
+|---|---:|
+| Trung bình | **17,861.8 ms** |
+| P50 | **10,136.0 ms** |
+| P95 | **54,311.2 ms** |
+| Nhỏ nhất | **5,178.0 ms** |
+| Lớn nhất | **94,922.0 ms** |
+
+### RAGAS
+
+| Metric | Điểm | Phần trăm |
+|---|---:|---:|
+| Faithfulness | **0.9005** | **90.05%** |
+| Answer relevancy | **0.8018** | **80.18%** |
+| Context precision | **0.9490** | **94.90%** |
+| Context recall | **0.9075** | **90.75%** |
+
+RAGAS nhận 68 dòng `vector_search` hợp lệ. Trong đó có một câu hỏi bị lặp,
+nên kết quả gồm 67 mẫu duy nhất đã đánh giá thành công, không có mẫu thất bại
+hoặc bị bỏ qua. Vì summary lấy 68 dòng hợp lệ trừ 67 khóa kết quả duy nhất,
+`n_remaining=1` là hệ quả của cơ chế deduplicate/resume, không phải một mẫu
+duy nhất chưa được đánh giá.
+
+### Nhận xét và phạm vi diễn giải
+
+- `context_precision` là metric RAGAS cao nhất, đạt 94.90%;
+  `answer_relevancy` thấp nhất, đạt 80.18%.
+- `employee_query` có tool accuracy thấp nhất (80.00%), nhưng tập này chỉ có
+  5 mẫu.
+- `attendance_query` có latency trung bình cao nhất (42.07 giây) và P95 đạt
+  92.59 giây.
+- 2.44% là **tỷ lệ xuất hiện `ask_user` trên toàn bộ tập**, không phải độ chính
+  xác phát hiện câu hỏi mơ hồ. Muốn đo clarification accuracy cần một tập mẫu
+  được gán nhãn riêng cho trường hợp cần/không cần hỏi lại.
+
+Chi tiết đầy đủ xem tại
+[`agentic-rag/eval/report.md`](./agentic-rag/eval/report.md). Số liệu nguồn:
+[`metrics_summary.json`](./agentic-rag/eval/results/metrics_summary.json) và
+[`ragas_summary_run2.json`](./agentic-rag/eval/results/ragas_summary_run2.json).
 
 ## Engineering Notes / Lessons Learned
 
@@ -368,4 +438,3 @@ curl -N -X POST http://localhost:8000/api/v1/chat/<conversation_id>/messages/str
 | api-service | `8000` | `8000` | Core Backend. |
 | agentic-rag | `8081` | `8081` | Agentic Service. |
 | web-dashboard | `5173` | N/A | Vite dev server khi chạy local. |
-
